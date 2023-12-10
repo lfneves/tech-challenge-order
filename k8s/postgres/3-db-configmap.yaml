@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config-map
+  labels:
+    app: postgresdb
+data:
+  POSTGRES_DB: postgresdb
+  POSTGRES_PORT: "5432"
+  POSTGRES_HOST: postgresql-delivery.cf1zoi5dlyni.us-east-1.rds.amazonaws.com
