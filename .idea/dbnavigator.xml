@@ -14,16 +14,23 @@
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="42c3620e-e40a-46e1-9594-642dd3e8e8fa">
       <console name="Connection" type="STANDARD" schema="postgresdb" session="Main" />
-      <console name="Connection 1" type="STANDARD" schema="postgresdb" session="Main"><![CDATA[select
-    tc.cpf,
+      <console name="Connection 1" type="STANDARD" schema="public" session="Main"><![CDATA[select
+    tc.description,
     tc.dh_insert,
-    tc.email,
     tc."id",
-    tc.id_address,
-    tc."name",
-    tc."password"
+    tc."name"
 from
-    tb_client tc;]]></console>
+    tb_category tc;
+
+select
+    tp.dh_insert,
+    tp."id",
+    tp.id_category,
+    tp."name",
+    tp.price,
+    tp.quantity
+from
+    tb_product tp;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

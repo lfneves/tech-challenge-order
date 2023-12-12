@@ -112,7 +112,7 @@ class OrderServiceImpl(
             }
     }
 
-    private fun saveAllOrderProduct(data: List<OrderProductEntity>?): Flux<OrderProductEntity> {
+    fun saveAllOrderProduct(data: List<OrderProductEntity>?): Flux<OrderProductEntity> {
         return Flux.fromIterable(data!!).flatMap(orderProductRepository::save)
     }
 
