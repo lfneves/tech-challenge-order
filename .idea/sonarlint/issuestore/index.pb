@@ -95,3 +95,7 @@ l
 :
 
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
+m
+=src/main/kotlin/com/mvp/order/domain/model/user/AddressDTO.kt,a/9/a9c16f2bc65962039b90452c106c8e87e760546a
+n
+>src/main/kotlin/com/mvp/order/domain/model/user/UsernameDTO.kt,4/5/45446c5fc341a634730b4594a40441489d33465f

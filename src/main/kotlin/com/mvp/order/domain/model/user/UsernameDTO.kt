@@ -1,4 +1,4 @@
-package com.mvp.delivery.domain.model.user
+package com.mvp.order.domain.model.user
 
 data class UsernameDTO(
     // user cpf

@@ -1,12 +1,11 @@
 package com.mvp.order.domain.service.client.user
 
-import com.mvp.delivery.domain.model.user.UsernameDTO
+import com.mvp.order.domain.model.user.UsernameDTO
 import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.user.UserDTO
 import com.mvp.order.infrastruture.repository.user.AddressRepository
 import com.mvp.order.infrastruture.repository.user.UserRepository
 import com.mvp.order.utils.Sha512PasswordEncoder
-import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono

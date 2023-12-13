@@ -1,4 +1,4 @@
-package com.mvp.delivery.domain.model.user
+package com.mvp.order.domain.model.user
 
 import io.swagger.v3.oas.annotations.media.Schema
 

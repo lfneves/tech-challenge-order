@@ -14,19 +14,24 @@ import com.mvp.order.infrastruture.entity.order.OrderProductResponseEntity
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
 import io.mockk.*
+import io.mockk.impl.log.Logger
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.context.SpringBootTest
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.math.BigDecimal
+import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
 class OrderUnitTest {
+
+    private val logger: Logger = mockk(relaxed = true)
 
     private val orderRepository = mockk<OrderRepository>()
     private val userService = mockk<UserServiceImpl>()
@@ -38,7 +43,6 @@ class OrderUnitTest {
     private lateinit var orderProducts: MutableList<OrderProductResponseEntity>
     private lateinit var orderByIdResponseDTO: OrderByIdResponseDTO
     private lateinit var orderEntity: OrderEntity
-
     private lateinit var orderRequestDTO: OrderRequestDTO
     private lateinit var userDTO: UserDTO
     private lateinit var productDTOList: List<ProductDTO>
@@ -149,8 +153,6 @@ class OrderUnitTest {
         every { userService.getByUsername(orderRequestDTO.username) } returns Mono.just(userDTO)
         every { productService.getAllById(listOf(1L)) } returns Flux.just(product)
         every { orderRepository.findByUsername(orderRequestDTO.username) } returns Mono.just(orderEntity)
-//        every { orderRepository.save(any()) } answers { Mono.just(firstArg()) }
-//        every { orderServiceImplMockk.saveAllOrderProduct(any()) } just Awaits
         every { orderProductRepository.save(any()) } returns Mono.just(orderProductEntity)
         every { orderRepository.save(orderEntity) } returns Mono.just(orderEntity)
         every { orderServiceImplMockk.saveAllOrderProduct(listOf(orderProductEntity)) } returns Flux.just(orderProductEntity)
@@ -164,7 +166,19 @@ class OrderUnitTest {
 
     @Test
     fun updateOrderProduct() {
+        every { userService.getByUsername(orderRequestDTO.username) } returns Mono.just(userDTO)
+        every { orderRepository.findByUsername(orderRequestDTO.username) } returns Mono.just(orderEntity)
+        every { orderServiceImpl.createOrder(orderRequestDTO) } returns Mono.just(orderResponseDTO)
 
+        StepVerifier.create(orderServiceImpl.updateOrderProduct(orderRequestDTO))
+            .expectNextMatches{ response ->
+                response.orderDTO?.id == orderResponseDTO.orderDTO?.id
+                        && response.orderDTO?.status == orderResponseDTO.orderDTO?.status
+                        && response.orderDTO?.externalId == orderResponseDTO.orderDTO?.externalId
+                        && response.orderDTO?.isFinished == orderResponseDTO.orderDTO?.isFinished
+            }.expectComplete()
+
+        verify(exactly = 1) { orderRepository.findByUsername(orderRequestDTO.username) }
     }
 
     @Test

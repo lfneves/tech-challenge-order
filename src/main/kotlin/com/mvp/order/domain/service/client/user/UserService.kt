@@ -1,8 +1,7 @@
 package com.mvp.order.domain.service.client.user
 
 import com.mvp.order.domain.model.user.UserDTO
-import com.mvp.delivery.domain.model.user.UsernameDTO
-import org.springframework.security.core.Authentication
+import com.mvp.order.domain.model.user.UsernameDTO
 import reactor.core.publisher.Mono
 
 interface UserService {
