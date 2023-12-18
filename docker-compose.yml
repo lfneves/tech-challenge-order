@@ -16,14 +16,15 @@
 version: '3.7'
 
 services:
-  delivery-mvp:
+  order-ws:
     image: order-ws:latest
     container_name: order-ws
     build: .
     ports:
       - '8099:8099'
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - mvp-network
 
@@ -45,7 +46,10 @@ services:
       - ./src/main/resources/database/2_inserts_category.sql:/docker-entrypoint-initdb.d/2_inserts_category.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 1s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - mvp-network
 

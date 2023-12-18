@@ -1,10 +1,11 @@
 package com.mvp.order.application.unit.order
 
+import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
+import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.domain.model.user.UserDTO
-import com.mvp.order.domain.service.client.order.OrderService
 import com.mvp.order.domain.service.client.order.OrderServiceImpl
 import com.mvp.order.domain.service.client.product.ProductServiceImpl
 import com.mvp.order.domain.service.client.user.UserServiceImpl
@@ -13,18 +14,17 @@ import com.mvp.order.infrastruture.entity.order.OrderProductEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductResponseEntity
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
+import com.mvp.order.utils.constants.ErrorMsgConstants
 import io.mockk.*
 import io.mockk.impl.log.Logger
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.math.BigDecimal
-import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -183,22 +183,78 @@ class OrderUnitTest {
 
     @Test
     fun deleteOrderById() {
+        val orderId = 1L
+        val monoVoid: Mono<Void> = Mono.empty()
 
+        // Mocking behavior
+        every { orderRepository.findByIdOrder(orderId) } returns Mono.just(orderEntity)
+        every { orderProductRepository.deleteByIdOrder(orderId) } returns monoVoid
+        every { orderRepository.deleteById(orderId) } returns monoVoid
+
+        // Call the method
+        val result = orderServiceImpl.deleteOrderById(orderId)
+
+        // Verify the result
+        StepVerifier.create(result)
+            .verifyComplete()
+
+        // Verify interactions with mocks
+        verify { orderRepository.findByIdOrder(orderId) }
+        verify { orderProductRepository.deleteByIdOrder(orderId) }
+        verify { orderRepository.deleteById(orderId) }
     }
 
     @Test
     fun deleteOrderProductById() {
+        val productRemoveOrderDTO = ProductRemoveOrderDTO(orderRequestDTO.username, mutableListOf(1L))
+        val listProductId = productRemoveOrderDTO.orderProductId.map { it }.toList()
 
+        every { orderProductRepository.deleteById(listProductId) } returns Mono.error(
+            Exceptions.NotFoundException(
+            ErrorMsgConstants.ERROR_ORDER_NOT_FOUND))
+
+        val result = orderServiceImpl.deleteOrderProductById(productRemoveOrderDTO)
+
+        StepVerifier.create(result)
+            .expectErrorMatches { it is Exceptions.NotFoundException && it.message == ErrorMsgConstants.ERROR_ORDER_NOT_FOUND }
+            .verify()
+
+        // Verify interactions with the mock
+        verify(exactly = 1) { orderProductRepository.deleteById(listProductId) }
     }
 
     @Test
     fun getAllOrderProductsByIdOrder() {
+        val id = 123L
+        every { orderProductRepository.findAllByIdOrderInfo(id) } returns Flux.fromIterable(orderProducts)
 
+        val result = orderServiceImpl.getAllOrderProductsByIdOrder(id)
+
+        StepVerifier.create(result)
+            .expectNextMatches { it.id == orderProducts.get(0).id }
+            .verifyComplete()
+
+        // Verify interactions with the mock
+        verify(exactly = 1) { orderProductRepository.findAllByIdOrderInfo(id) }
     }
 
     @Test
     fun fakeCheckoutOrder() {
+        val orderCheckoutDTO = OrderCheckoutDTO(idOrder = 123L) // Replace with actual data
 
+        every { orderRepository.findByIdOrder(orderCheckoutDTO.idOrder) } returns Mono.just(orderEntity)
+        every { orderRepository.save(any()) } answers { Mono.just(firstArg()) }
+
+        val result = orderServiceImpl.fakeCheckoutOrder(orderCheckoutDTO)
+
+        // Verify results
+        StepVerifier.create(result)
+            .expectNext(true)
+            .verifyComplete()
+
+        // Verify interactions with the mock
+        verify(exactly = 1) { orderRepository.findByIdOrder(orderCheckoutDTO.idOrder) }
+        verify(exactly = 1) { orderRepository.save(any()) }
     }
 
 }

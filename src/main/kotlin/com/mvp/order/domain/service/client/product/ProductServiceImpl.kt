@@ -17,17 +17,11 @@ import reactor.kotlin.core.publisher.toMono
 import java.math.BigDecimal
 
 @Service
-//@CacheConfig(cacheNames = ["productsCache"])
 class ProductServiceImpl(
     private val productRepository: ProductRepository,
     private val categoryRepository: CategoryRepository
 ) : ProductService {
 
-    lateinit var productsCache: Flux<ProductDTO>
-
-    init {
-        this.productsCache = getProducts()
-    }
 
     override fun getProductById(id: Int): Mono<ProductDTO> {
         return productRepository.findById(id)
@@ -40,7 +34,6 @@ class ProductServiceImpl(
             }
     }
 
-//    @CachePut(cacheNames = ["productsCache"])
     override fun getProducts(): Flux<ProductDTO> {
         return productRepository
             .findAll()
@@ -52,7 +45,6 @@ class ProductServiceImpl(
             }
     }
 
-//    @CachePut("productsCache")
     override fun getAllById(id: List<Long>): Flux<ProductDTO> {
         return productRepository
             .findAllProductById(id)
@@ -78,7 +70,7 @@ class ProductServiceImpl(
 
     }
 
-    @Cacheable("productsCache")
+//    @Cacheable("productsCache")
     override fun getProductsByCategoryByName(name: String): Flux<ProductDTO> {
         return categoryRepository.findByName(name)
             .switchIfEmpty(Mono.error(Exceptions.NotFoundException(ErrorMsgConstants.ERROR_CATEGORY_NOT_FOUD)))

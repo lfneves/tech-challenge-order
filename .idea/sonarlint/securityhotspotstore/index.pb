@@ -99,3 +99,13 @@ m
 =src/main/kotlin/com/mvp/order/domain/model/user/AddressDTO.kt,a/9/a9c16f2bc65962039b90452c106c8e87e760546a
 n
 >src/main/kotlin/com/mvp/order/domain/model/user/UsernameDTO.kt,4/5/45446c5fc341a634730b4594a40441489d33465f
+{
+Ksrc/main/kotlin/com/mvp/order/infrastruture/entity/product/ProductEntity.kt,7/8/78cfbcbcaab34142d7b92b039923b4caf93e58ea
+}
+Msrc/main/kotlin/com/mvp/order/infrastruture/repository/user/UserRepository.kt,3/2/326207b90b6e62c3aa69818ec091b32496800662
+‚
+Rsrc/test/kotlin/com/mvp/order/application/integration/order/OrderRequestApiTest.kt,7/b/7bd39af6c4724cf800e0c3f1a0053377112f9c00
+y
+Isrc/test/kotlin/com/mvp/order/application/unit/product/productUnitTest.kt,6/2/620f569bf40f7bddac076f82b29864e61ae39b47
+y
+Isrc/test/kotlin/com/mvp/order/application/unit/product/ProductUnitTest.kt,d/2/d2784c9f4970b91d8c416fc1a85c48656b058f05
