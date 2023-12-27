@@ -1,11 +1,14 @@
 package com.mvp.order.domain.service.client.order
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.mvp.order.domain.service.client.user.UserServiceImpl
 import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.order.enums.OrderStatusEnum
 import com.mvp.order.domain.model.product.ProductDTO
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
+import com.mvp.order.domain.service.client.message.SnsService
 import com.mvp.order.domain.service.client.product.ProductServiceImpl
 import com.mvp.order.infrastruture.entity.order.OrderEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductEntity
@@ -31,9 +34,12 @@ class OrderServiceImpl(
     private val orderRepository: OrderRepository,
     private val userService: UserServiceImpl,
     private val orderProductRepository: OrderProductRepository,
-    private val productService: ProductServiceImpl
+    private val productService: ProductServiceImpl,
+    private val snsService: SnsService
 ): OrderService {
     var logger: Logger = LoggerFactory.getLogger(OrderServiceImpl::class.java)
+
+    private val mapper = ObjectMapper().registerModule(JavaTimeModule())
 
     override fun getOrderById(id: Long): Mono<OrderByIdResponseDTO> {
         return orderRepository.findByIdOrder(id)
@@ -96,6 +102,7 @@ class OrderServiceImpl(
                     it.idOrder = orderEntity.id
                 }
                 saveAllOrderProduct(orderRequestDTO.toEntityList().toList()).subscribe()
+                snsService.sendMessage(mapper.writeValueAsString(orderEntity.toDTO()))
                 OrderResponseDTO(orderEntity.toDTO())
             }
     }

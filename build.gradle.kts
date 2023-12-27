@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.2.0"
+	id("org.springframework.boot") version "3.2.1"
 	id("io.spring.dependency-management") version "1.1.4"
 	kotlin("jvm") version "1.9.21"
 	kotlin("plugin.spring") version "1.9.21"
@@ -15,7 +15,7 @@ repositories {
 	mavenCentral()
 }
 
-val springVersion by extra { "3.2.0" }
+val springVersion by extra { "3.2.1" }
 
 dependencies {
 
@@ -27,12 +27,17 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:$springVersion")
 	implementation("org.springframework.session:spring-session-core:$springVersion")
 	implementation("org.springframework.boot:spring-boot-starter-cache:$springVersion")
-	implementation("org.springframework.boot:spring-boot-docker-compose:$springVersion")
+//	implementation("org.springframework.boot:spring-boot-docker-compose:$springVersion")
 
 	// Kotlin utils
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0")
+
+	//SQS and SNS
+	implementation("software.amazon.awssdk:sqs:2.22.5")
+	implementation("software.amazon.awssdk:sns:2.22.5")
 
 	// Postgress reactive
 	implementation("io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE")

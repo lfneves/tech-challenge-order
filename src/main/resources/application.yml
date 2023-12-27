@@ -46,3 +46,5 @@ order:
     notificationUrl: "${NOTIFICATION_URL:https://hkdk.events/lfMwUjaPsk5y}"
   api-endpoints:
     qrs: "instore/orders/qr/seller/collectors/?/pos/?/qrs"
+  sns:
+    topicArn: "${TOPIC_ORDER_SNS:arn:aws:sns:us-east-1:566907801160:ORDER_TOPIC}"

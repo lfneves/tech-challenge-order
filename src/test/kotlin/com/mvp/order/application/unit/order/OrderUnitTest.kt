@@ -6,6 +6,7 @@ import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.domain.model.user.UserDTO
+import com.mvp.order.domain.service.client.message.SnsService
 import com.mvp.order.domain.service.client.order.OrderServiceImpl
 import com.mvp.order.domain.service.client.product.ProductServiceImpl
 import com.mvp.order.domain.service.client.user.UserServiceImpl
@@ -37,8 +38,9 @@ class OrderUnitTest {
     private val userService = mockk<UserServiceImpl>()
     private val orderProductRepository = mockk<OrderProductRepository>()
     private val productService = mockk<ProductServiceImpl>()
+    private val snsService = mockk<SnsService>()
 
-    private val orderServiceImpl = OrderServiceImpl(orderRepository, userService, orderProductRepository, productService)
+    private val orderServiceImpl = OrderServiceImpl(orderRepository, userService, orderProductRepository, productService, snsService)
 
     private lateinit var orderProducts: MutableList<OrderProductResponseEntity>
     private lateinit var orderByIdResponseDTO: OrderByIdResponseDTO

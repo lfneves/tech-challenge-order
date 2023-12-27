@@ -62,14 +62,6 @@ class ProductServiceImpl(
             .map { it }
     }
 
-    private fun getCategoryByName(name: String): Mono<CategoryDTO> {
-        return categoryRepository.findByName(name)
-            .switchIfEmpty(Mono.error(Exceptions.NotFoundException(ErrorMsgConstants.ERROR_CATEGORY_NOT_FOUD)))
-            .map { it.toDTO() }
-            .toMono()
-
-    }
-
 //    @Cacheable("productsCache")
     override fun getProductsByCategoryByName(name: String): Flux<ProductDTO> {
         return categoryRepository.findByName(name)
