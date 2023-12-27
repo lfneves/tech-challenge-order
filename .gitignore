@@ -1,5 +1,4 @@
 HELP.md
-.env
 .gradle
 build/
 build/**
@@ -96,3 +95,5 @@ outTmp/
 /kotlin-native/dist
 kotlin-ide/
 .kotlin/
+
+.env
