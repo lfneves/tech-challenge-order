@@ -1,7 +1,6 @@
 package com.mvp.order.domain.model.order
 
 import com.mvp.order.infrastruture.entity.order.OrderEntity
-import com.mvp.order.infrastruture.entity.order.OrderProductResponseEntity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -16,7 +15,7 @@ data class OrderByIdResponseDTO(
     var status: String = "",
     var waitingTime: LocalDateTime = ZonedDateTime.now(ZoneId.of( "America/Sao_Paulo")).toLocalDateTime(),
     var isFinished: Boolean = false,
-    var products: MutableList<OrderProductResponseEntity> = mutableListOf()
+    var products: MutableList<OrderProductResponseDTO> = mutableListOf()
 ) {
     fun toEntity(): OrderEntity {
         return OrderEntity(

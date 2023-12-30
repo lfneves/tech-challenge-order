@@ -1,18 +1,13 @@
 package com.mvp.order
 
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
+import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @SpringBootApplication
-@EnableR2dbcAuditing
-@EnableCaching
-class OrderApplication {
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            SpringApplication.run(OrderApplication::class.java, *args)
-        }
-    }
+@EnableJpaRepositories(basePackages = ["com.mvp.order.infrastruture.repository"])
+class OrderApplication
+
+fun main(args: Array<String>) {
+    runApplication<OrderApplication>(*args)
 }

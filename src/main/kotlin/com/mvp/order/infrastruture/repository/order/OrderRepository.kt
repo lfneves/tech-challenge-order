@@ -1,24 +1,15 @@
 package com.mvp.order.infrastruture.repository.order
 
 import com.mvp.order.infrastruture.entity.order.OrderEntity
-import org.springframework.data.r2dbc.repository.Query
-import org.springframework.data.repository.reactive.ReactiveCrudRepository
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import java.util.UUID
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
+import java.util.*
 
-interface OrderRepository : ReactiveCrudRepository<OrderEntity?, Long?> {
-
-    @Query("""
-        SELECT tb_order.id, tb_order.external_id, id_client, SUM(price) AS total_price, status, is_finished, waiting_time
-         FROM tb_order 
-         INNER JOIN tb_client ON tb_client.id = tb_order.id_client
-         INNER JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
-         INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
-         WHERE tb_client.cpf = $1
-         GROUP BY tb_order.id, id_client, status, is_finished
-    """)
-    fun findByUsername(username: String?): Mono<OrderEntity>
+@Repository
+interface OrderRepository : JpaRepository<OrderEntity, Long> {
 
     @Query("""
         SELECT tb_order.id, tb_order.external_id, id_client, SUM(price) AS total_price, status, is_finished, waiting_time
@@ -26,10 +17,10 @@ interface OrderRepository : ReactiveCrudRepository<OrderEntity?, Long?> {
          INNER JOIN tb_client ON tb_client.id = tb_order.id_client
          INNER JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
          INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
-         WHERE tb_order.id = $1
+         WHERE tb_client.cpf = :username
          GROUP BY tb_order.id, id_client, status, is_finished
-    """)
-    fun findByIdOrder(id: Long): Mono<OrderEntity>
+    """, nativeQuery = true)
+    fun findByUsername(username: String?): OrderEntity
 
     @Query("""
         SELECT tb_order.id, tb_order.external_id, id_client, SUM(price) AS total_price, status, is_finished, waiting_time
@@ -37,10 +28,10 @@ interface OrderRepository : ReactiveCrudRepository<OrderEntity?, Long?> {
          INNER JOIN tb_client ON tb_client.id = tb_order.id_client
          INNER JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
          INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
-         WHERE tb_order.external_id = $1
+         WHERE tb_order.id = :id
          GROUP BY tb_order.id, id_client, status, is_finished
-    """)
-    fun findByExternalId(externalId: UUID): Mono<OrderEntity>
+    """, nativeQuery = true)
+    fun findByIdOrder(id: Long): OrderEntity
 
     @Query("""
         SELECT tb_order.id, tb_order.external_id, id_client, SUM(price) AS total_price, status, is_finished, waiting_time
@@ -48,15 +39,12 @@ interface OrderRepository : ReactiveCrudRepository<OrderEntity?, Long?> {
          INNER JOIN tb_client ON tb_client.id = tb_order.id_client
          INNER JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
          INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
+         WHERE tb_order.external_id = :externalId
          GROUP BY tb_order.id, id_client, status, is_finished
-    """)
-    fun findAllOrder(): Flux<OrderEntity>
+    """, nativeQuery = true)
+    fun findByExternalId(@Param("externalId") externalId: String): OrderEntity
 
-
-    @Query("""
-        UPDATE tb_order 
-            SET status = :#{#orderEntity.status}
-        WHERE id = :#{#orderEntity.id}
-    """)
-    suspend fun updateStatus(orderEntity: OrderEntity): OrderEntity
+    @Modifying
+    @Query(value = "UPDATE tb_order SET status = :status WHERE id = :id", nativeQuery = true)
+    fun updateStatus(id: Long, status: String)
 }

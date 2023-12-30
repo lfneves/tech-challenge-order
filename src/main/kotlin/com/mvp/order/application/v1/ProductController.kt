@@ -3,12 +3,10 @@ package com.mvp.order.application.v1
 
 import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
-import com.mvp.order.domain.service.client.product.ProductService
+import com.mvp.order.domain.service.product.ProductService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -20,7 +18,7 @@ class ProductController(private val productService: ProductService) {
         description = "Busca todos produtos cadastrados",
         tags = ["Produtos"]
     )
-    fun all(): Flux<ProductDTO> {
+    fun all(): List<ProductDTO> {
         return productService.getProducts()
     }
 
@@ -30,9 +28,8 @@ class ProductController(private val productService: ProductService) {
         description = "Busca produtos cadastrados pelo id informado",
         tags = ["Produtos"]
     )
-    fun getProductById(@PathVariable id: Int): Mono<ProductDTO> {
+    fun getProductById(@PathVariable id: Int): ProductDTO {
         return productService.getProductById(id)
-            .defaultIfEmpty(ProductDTO())
     }
 
     @GetMapping("/get-by-category-name")
@@ -42,7 +39,7 @@ class ProductController(private val productService: ProductService) {
         tags = ["Produtos"]
     )
     @ResponseStatus(HttpStatus.OK)
-    fun findByCategory(@RequestBody category: CategoryDTO): Flux<ProductDTO> {
+    fun findByCategory(@RequestBody category: CategoryDTO): List<ProductDTO> {
         return productService.getProductsByCategoryByName(category.name)
     }
 }

@@ -12,7 +12,7 @@ import com.mercadopago.exceptions.MPApiException
 import com.mercadopago.exceptions.MPException
 import com.mvp.order.domain.model.order.store.webhook.MerchantOrderResponseDTO
 import org.junit.jupiter.api.Test
-import org.springframework.web.reactive.function.client.WebClient
+//import org.springframework.web.reactive.function.client.WebClient
 import java.math.BigDecimal
 
 class PaymentCreateRequestTest {
@@ -24,16 +24,16 @@ class PaymentCreateRequestTest {
         val requestUrl = "https://api.mercadolibre.com/merchant_orders/11511214319"
         try {
 
-            val client = WebClient.create()
-            val response = client.get()
-                .uri(requestUrl)
-                .header("Authorization", TEST_MP_TOKEN)
-                .retrieve()
-                .bodyToMono(MerchantOrderResponseDTO::class.java)
+//            val client = WebClient.create()
+//            val response = client.get()
+//                .uri(requestUrl)
+//                .header("Authorization", TEST_MP_TOKEN)
+//                .retrieve()
+//                .bodyToMono(MerchantOrderResponseDTO::class.java)
 //                .flatMap { t -> Mono.just(t) }
 
-            val test = response
-            println(mapper.writeValueAsString(test))
+//            val test = response
+//            println(mapper.writeValueAsString(test))
         } catch (e: Exception) {
             e.printStackTrace()
         }

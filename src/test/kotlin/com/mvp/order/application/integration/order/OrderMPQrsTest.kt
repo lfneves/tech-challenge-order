@@ -8,7 +8,6 @@ import com.mvp.order.domain.model.order.store.SponsorDTO
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.client.WebClient
 
 class OrderMPQrsTest {
 
@@ -59,18 +58,18 @@ class OrderMPQrsTest {
 
             println(mapper.writeValueAsString(orderQrsDTO))
 
-            val client = WebClient.create()
-            val responseSpec = client.put()
-                .uri("https://api.mercadopago.com/instore/orders/qr/seller/collectors/170225675/pos/170225675/qrs")
-                .header("Authorization", TEST_MP_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(mapper.writeValueAsString(orderQrsDTO))
-                .retrieve()
-                .bodyToMono(String::class.java)
-                .block()
-
-            println(responseSpec)
+//            val client = WebClient.create()
+//            val responseSpec = client.put()
+//                .uri("https://api.mercadopago.com/instore/orders/qr/seller/collectors/170225675/pos/170225675/qrs")
+//                .header("Authorization", TEST_MP_TOKEN)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .bodyValue(mapper.writeValueAsString(orderQrsDTO))
+//                .retrieve()
+//                .bodyToMono(String::class.java)
+//                .block()
+//
+//            println(responseSpec)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -81,18 +80,18 @@ class OrderMPQrsTest {
         try {
             val fileContent = this::class.java.classLoader.getResource("MockJsonQrs.json")?.readText()
 
-            val client = WebClient.create()
-            val responseSpec = client.put()
-                .uri("https://api.mercadopago.com/instore/orders/qr/seller/collectors/170225675/pos/170225675/qrs")
-                .header("Authorization", TEST_MP_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(fileContent!!)
-                .retrieve()
-                .bodyToMono(String::class.java)
-                .block()
-
-            println(responseSpec)
+//            val client = WebClient.create()
+//            val responseSpec = client.put()
+//                .uri("https://api.mercadopago.com/instore/orders/qr/seller/collectors/170225675/pos/170225675/qrs")
+//                .header("Authorization", TEST_MP_TOKEN)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .bodyValue(fileContent!!)
+//                .retrieve()
+//                .bodyToMono(String::class.java)
+//                .block()
+//
+//            println(responseSpec)
         } catch (e: Exception) {
             e.printStackTrace()
         }

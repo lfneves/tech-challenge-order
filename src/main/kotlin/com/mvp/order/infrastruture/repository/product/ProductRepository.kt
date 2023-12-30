@@ -1,25 +1,21 @@
 package com.mvp.order.infrastruture.repository.product
 
 import com.mvp.order.infrastruture.entity.product.ProductEntity
-import org.springframework.data.r2dbc.repository.Query
-import org.springframework.data.repository.reactive.ReactiveCrudRepository
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.stereotype.Repository
 
-interface ProductRepository : ReactiveCrudRepository<ProductEntity?, Long?> {
-    @Query("SELECT id, name, price, quantity FROM tb_product WHERE name = $1")
-    fun findByName(name: String?): Flux<ProductEntity>
+@Repository
+interface ProductRepository : JpaRepository<ProductEntity, Long> {
+    @Query("SELECT id, name, price, quantity FROM tb_product WHERE name = :name", nativeQuery = true)
+    fun findByName(name: String?): List<ProductEntity>
 
-    @Query("SELECT id, name, price, quantity, id_category FROM tb_product WHERE id_category = $1")
-    fun findByIdCategory(id: Long?): Flux<ProductEntity>
+    @Query("SELECT id, name, price, quantity, id_category FROM tb_product WHERE id_category = $1", nativeQuery = true)
+    fun findByIdCategory(id: Long?): List<ProductEntity>
 
-    @Query("SELECT id, name, price, quantity, id_category FROM tb_product WHERE id = :ids")
-    fun findAllProductById(ids: Iterable<Long>): Flux<ProductEntity>
+    @Query("SELECT id, name, price, quantity, id_category FROM tb_product WHERE id = :ids", nativeQuery = true)
+    fun findAllProductById(ids: Iterable<Long>): List<ProductEntity>
 
-    @Query("SELECT SUM(price) AS price FROM tb_product WHERE id IN(:ids)")
-    fun findByIdTotalPrice(ids: List<Long?>): Mono<ProductEntity>
-
-    fun findById(id: Int): Mono<ProductEntity>
-
-    fun deleteById(id: Int): Mono<Void>
+    @Query("SELECT SUM(price) AS price FROM tb_product WHERE id IN(:ids)", nativeQuery = true)
+    fun findByIdTotalPrice(ids: List<Long?>): ProductEntity
 }

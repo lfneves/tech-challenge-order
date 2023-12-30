@@ -3,18 +3,16 @@ package com.mvp.order.application.v1
 
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
-import com.mvp.order.domain.service.client.order.OrderService
+import com.mvp.order.domain.service.order.OrderService
 import io.swagger.v3.oas.annotations.Operation
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/api/v1/order")
-class OrderController(private val orderService: OrderService) {
+class OrderController @Autowired constructor(private val orderService: OrderService) {
 
     @PostMapping("/create-order")
     @Operation(
@@ -22,7 +20,7 @@ class OrderController(private val orderService: OrderService) {
         description = "Inicia um pedido informando e adiciona produdos pelo id",
         tags = ["Pedidos"]
     )
-    fun createOrder(@RequestBody orderRequestDTO: OrderRequestDTO): ResponseEntity<Mono<OrderResponseDTO>> {
+    fun createOrder(@RequestBody orderRequestDTO: OrderRequestDTO): ResponseEntity<OrderResponseDTO> {
         return ResponseEntity.ok(orderService.createOrder(orderRequestDTO))
     }
 
@@ -32,9 +30,8 @@ class OrderController(private val orderService: OrderService) {
         description = "Busca pedido por id",
         tags = ["Pedidos"]
     )
-    fun getOrderById(@PathVariable id: Long): ResponseEntity<Mono<OrderByIdResponseDTO>> {
+    fun getOrderById(@PathVariable id: Long): ResponseEntity<OrderByIdResponseDTO> {
         return ResponseEntity.ok(orderService.getOrderById(id)
-            .defaultIfEmpty(OrderByIdResponseDTO())
         )
     }
 
@@ -44,10 +41,9 @@ class OrderController(private val orderService: OrderService) {
         description = "Busca os produtos que estão associados por um pedido pelo id ",
         tags = ["Pedidos"]
     )
-    fun getAllOrderProductsByIdOrder(@PathVariable id: Long):  ResponseEntity<Flux<OrderProductResponseDTO>> {
+    fun getAllOrderProductsByIdOrder(@PathVariable id: Long):  ResponseEntity<List<OrderProductResponseDTO>> {
         return  ResponseEntity.ok(
             orderService.getAllOrderProductsByIdOrder(id)
-            .defaultIfEmpty(OrderProductResponseDTO())
         )
     }
 
@@ -58,7 +54,7 @@ class OrderController(private val orderService: OrderService) {
         tags = ["Pedidos"]
     )
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun updateOrderProduct(@RequestBody orderRequestDTO: OrderRequestDTO): ResponseEntity<Mono<OrderResponseDTO>> {
+    fun updateOrderProduct(@RequestBody orderRequestDTO: OrderRequestDTO): ResponseEntity<OrderResponseDTO> {
         return ResponseEntity.ok(orderService.updateOrderProduct(orderRequestDTO))
     }
 
@@ -69,7 +65,7 @@ class OrderController(private val orderService: OrderService) {
         tags = ["Pedidos"]
     )
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun deleteOrder(@PathVariable id: Long): ResponseEntity<Mono<Void>> {
+    fun deleteOrder(@PathVariable id: Long): ResponseEntity<Unit> {
         return ResponseEntity.ok(orderService.deleteOrderById(id))
     }
 
@@ -80,18 +76,7 @@ class OrderController(private val orderService: OrderService) {
         tags = ["Pedidos"]
     )
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun deleteOrderProductById(@RequestBody productRemoveOrderDTO: ProductRemoveOrderDTO): ResponseEntity<Mono<Void>> {
+    fun deleteOrderProductById(@RequestBody productRemoveOrderDTO: ProductRemoveOrderDTO): ResponseEntity<Unit> {
         return ResponseEntity.ok(orderService.deleteOrderProductById(productRemoveOrderDTO))
-    }
-
-    @PutMapping("/fake-checkout")
-    @Operation(
-        summary = "Efetua o pagamento atualizando os status",
-        description = "Efetua o pagamento atualizando os status",
-        tags = ["Pedidos"]
-    )
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    fun checkoutOrder(@RequestBody orderCheckoutDTO: OrderCheckoutDTO): ResponseEntity<Mono<Boolean>> {
-        return ResponseEntity.ok(orderService.fakeCheckoutOrder(orderCheckoutDTO))
     }
 }

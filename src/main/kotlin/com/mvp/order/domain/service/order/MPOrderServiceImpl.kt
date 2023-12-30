@@ -1,21 +1,18 @@
-package com.mvp.order.domain.service.client.order
+package com.mvp.order.domain.service.order
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.mvp.order.domain.configuration.OrderEndpointPropertyConfiguration
 import com.mvp.order.domain.configuration.OrderPropertyConfiguration
-import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.OrderByIdResponseDTO
 import com.mvp.order.domain.model.order.enums.OrderStatusEnum
 import com.mvp.order.domain.model.order.store.*
 import com.mvp.order.domain.model.order.store.webhook.MerchantOrderDTO
 import com.mvp.order.domain.model.order.store.webhook.MerchantOrderResponseDTO
 import com.mvp.order.infrastruture.repository.order.OrderRepository
-import com.mvp.order.utils.constants.ErrorMsgConstants
-import kotlinx.coroutines.reactor.awaitSingle
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -26,54 +23,52 @@ class MPOrderServiceImpl(
     private val orderEndpointPropertyConfiguration: OrderEndpointPropertyConfiguration
 ): MPOrderService {
 
-    private val client = WebClient.create()
+    private val restTemplate = RestTemplate()
 
-    override fun checkoutOrder(username: String): Mono<QrDataDTO> {
-        return orderRepository.findByUsername(username)
-            .switchIfEmpty(Mono.error(Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)))
-            .flatMap {
-                orderService.getOrderById(it.id!!)
-                    .flatMap {
-                        Mono.just(orderCheckoutGenerateQrs(it))
-                    }.map { jsonRequest ->
-                        jsonRequest
-                    }
-            }.flatMap {
-                generateOrderQrs(it)
-            }
+    override fun checkoutOrder(username: String): QrDataDTO {
+        val orderEntity = orderRepository.findByUsername(username)
+        val orderByIdResponse = orderService.getOrderById(orderEntity.id!!)
+        val jsonRequest = orderCheckoutGenerateQrs(orderByIdResponse)
+
+        return generateOrderQrs(jsonRequest)
     }
 
-    override suspend fun saveCheckoutOrderExternalStoreID(merchantOrderDTO: MerchantOrderDTO): Mono<Void> {
-        val  test = getMerchantOrderByID(merchantOrderDTO.resource).awaitSingle()
+    override fun saveCheckoutOrderExternalStoreID(merchantOrderDTO: MerchantOrderDTO) {
+        val  test = getMerchantOrderByID(merchantOrderDTO.resource)
         val order = orderService.getOrderByExternalId(UUID.fromString(test.externalReference))
         order?.status = if (test.orderStatus == "payment_required") OrderStatusEnum.PAYMENT_REQUIRED.value
             else OrderStatusEnum.PENDING.value
-        orderRepository.updateStatus(order!!.toEntity())
-        return Mono.empty()
+        orderRepository.updateStatus(order?.id!!, order.status)
     }
 
-    override fun getMerchantOrderByID(requestUrl: String): Mono<MerchantOrderResponseDTO> {
-        return client.get()
-            .uri(requestUrl)
-            .header("Authorization", orderPropertyConfiguration.token)
-            .retrieve()
-            .bodyToMono(MerchantOrderResponseDTO::class.java)
+    override fun getMerchantOrderByID(requestUrl: String): MerchantOrderResponseDTO {
+        val headers = HttpHeaders()
+        headers.set("Authorization", orderPropertyConfiguration.token)
+
+        val entity = HttpEntity<String>(headers)
+
+        return restTemplate.exchange(
+            requestUrl,
+            HttpMethod.GET,
+            entity,
+            MerchantOrderResponseDTO::class.java
+        ).body ?: throw RuntimeException("Response body is null")
     }
 
-    override fun generateOrderQrs(requestBody: String): Mono<QrDataDTO> {
-
+    override fun generateOrderQrs(requestBody: String): QrDataDTO {
         val endpoint = orderEndpointPropertyConfiguration.qrs.replace("?", orderPropertyConfiguration.userId)
         val requestUrl = orderPropertyConfiguration.url + endpoint
-        val responseSpec = client.put()
-            .uri(requestUrl)
-            .header("Authorization", orderPropertyConfiguration.token)
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(requestBody)
-            .retrieve()
-            .bodyToMono(QrDataDTO::class.java)
 
-        return responseSpec
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            accept = listOf(MediaType.APPLICATION_JSON)
+            set("Authorization", orderPropertyConfiguration.token)
+        }
+
+        val entity = HttpEntity<String>(requestBody, headers)
+        return restTemplate.exchange(
+            requestUrl, HttpMethod.PUT, entity, QrDataDTO::class.java
+        ).body ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No response from QR service")
     }
 
     override fun orderCheckoutGenerateQrs(order: OrderByIdResponseDTO): String {

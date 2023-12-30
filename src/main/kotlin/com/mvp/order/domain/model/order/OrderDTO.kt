@@ -14,7 +14,8 @@ data class OrderDTO(
     var totalPrice: BigDecimal = BigDecimal.ZERO,
     var status: String = "",
     var waitingTime: LocalDateTime = ZonedDateTime.now(ZoneId.of( "America/Sao_Paulo")).toLocalDateTime(),
-    var isFinished: Boolean = false
+    var isFinished: Boolean = false,
+    var productList: MutableList<OrderProductResponseDTO> = mutableListOf()
 ) {
     fun toEntity(): OrderEntity{
         return OrderEntity(

@@ -2,18 +2,18 @@ package com.mvp.order.infrastruture.entity.order
 
 import com.mvp.order.domain.model.order.OrderProductDTO
 import com.mvp.order.domain.model.order.OrderProductResponseDTO
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
-import org.springframework.data.relational.core.mapping.Table
+import jakarta.persistence.*
 import java.math.BigDecimal
 
-@Table("tb_order_product")
+@Entity
+@Table(name = "tb_order_product")
 data class OrderProductEntity(
-    @Id @Column("id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @Column("id_product")
+    @Column(name = "id_product")
     var idProduct: Long? = null,
-    @Column("id_order")
+    @Column(name = "id_order")
     var idOrder: Long? = null
 ) {
     fun toDTO() : OrderProductDTO {

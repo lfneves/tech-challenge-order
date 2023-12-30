@@ -2,25 +2,20 @@ package com.mvp.order.infrastruture.entity.product
 
 import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
-import jakarta.persistence.CascadeType
-import jakarta.persistence.FetchType
-import jakarta.persistence.OneToMany
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
-import org.springframework.data.relational.core.mapping.Table
+import jakarta.persistence.*
 import java.math.BigDecimal
 
 
-@Table("tb_product")
+@Entity
+@Table(name = "tb_product")
 data class ProductEntity(
     @Id
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "id", cascade = [CascadeType.ALL], orphanRemoval=true)
     var id: Long? = null,
     var name: String = "",
     var price: BigDecimal = BigDecimal.ZERO,
     var quantity: Int = 0,
 
-    @Column("id_category")
+    @Column(name = "id_category")
     var idCategory: Long? = null
 ) {
     fun toDTO(): ProductDTO {

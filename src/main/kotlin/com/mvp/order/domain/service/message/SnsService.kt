@@ -1,4 +1,4 @@
-package com.mvp.order.domain.service.client.message
+package com.mvp.order.domain.service.message
 
 import com.mvp.order.domain.configuration.AwsSnsConfig
 import org.springframework.stereotype.Service

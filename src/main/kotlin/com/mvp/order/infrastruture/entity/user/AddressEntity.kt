@@ -1,11 +1,13 @@
 package com.mvp.order.infrastruture.entity.user
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
-import org.springframework.data.relational.core.mapping.Table
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
-@Table("tb_address")
+@Entity
+@Table(name = "tb_address")
 data class AddressEntity (
     @Id
     @Schema(hidden = true)
@@ -14,7 +16,7 @@ data class AddressEntity (
     var city: String? = null,
     var state: String? = null,
 
-    @Column("postal_code")
+    @Column(name = "postal_code")
     var postalCode: String? =null
 ) {
     fun updateUserEntity(address: AddressEntity, request: AddressEntity) {

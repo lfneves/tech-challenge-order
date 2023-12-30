@@ -1,7 +1,7 @@
 server:
   port: 8099
   servlet:
-    contextPath: /
+    contextPath: "/"
   error:
     include-message: always
 
@@ -12,29 +12,21 @@ spring-doc:
 spring:
   profiles:
     active: production
-  main:
-    allow-bean-definition-overriding: true
-  webflux:
-    base-path: /
+  datasource:
+#    url: "${POSTGRES_HOST:jdbc:postgresql://localhost:5432/postgresdb}"
+    url: "jdbc:postgresql://localhost:5432/postgresdb"
+    username: "${POSTGRES_USER:postgres}"
+    password: "${POSTGRES_PASSWORD:postgres}"
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
   docker:
     compose:
       file: "docker-compose.yml"
-
-logging:
-  level:
-    root:
-      org.springframework.web: "debug"
-      org.hibernate: "debug"
-
-datasource:
-  host: "${POSTGRES_HOST:localhost}"
-  port: "${POSTGRES_PORT:5432}"
-  database: "${POSTGRES_DB:postgresdb}"
-  user: "${POSTGRES_USER:postgres}"
-  password: "${POSTGRES_PASSWORD:postgres}"
-  pool:
-    min-connections: 1
-    max-connections: 30
 
 order:
   mp-api:

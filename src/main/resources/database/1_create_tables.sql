@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS tb_order (
     dh_insert TIMESTAMP DEFAULT NOW()
 );
 
+--CREATE SEQUENCE public.tb_order_product_seq INCREMENT BY 1 MINVALUE 1 START WITH 1;
+
 CREATE TABLE IF NOT EXISTS tb_order_product (
     id                  SERIAL  PRIMARY KEY,
     id_product          INTEGER REFERENCES tb_product(id),
