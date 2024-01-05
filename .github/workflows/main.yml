@@ -68,7 +68,7 @@ jobs:
         login: ${{ secrets.SONARQUBE_TOKEN }}
 
   ecr:
-    needs: build
+    needs: sonarqube
     runs-on: ubuntu-latest
 
     steps:
