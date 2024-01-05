@@ -52,8 +52,8 @@ jobs:
           name: jar-file
           path: app.jar
           
-  sonarqube:
-    name: SonarQube Trigger
+  sonarcloud:
+    name: Sonar Trigger
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -62,7 +62,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: SonarQube Scan
-      uses: kitabisa/sonarqube-action@v1.2.0
+      uses: sonarsource/sonarcloud-github-action@master
       with:
         host: ${{ secrets.SONARQUBE_HOST }}
         login: ${{ secrets.SONARQUBE_TOKEN }}
