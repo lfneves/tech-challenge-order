@@ -67,7 +67,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   ecr:
-    needs: sonarqube
+    needs: sonarcloud
     runs-on: ubuntu-latest
 
     steps:
