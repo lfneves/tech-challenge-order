@@ -2,6 +2,7 @@ package com.mvp.order.domain.service.order
 
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
+import com.mvp.order.infrastruture.entity.order.OrderProductEntity
 import java.util.*
 
 interface OrderService {
@@ -19,4 +20,6 @@ interface OrderService {
     fun deleteOrderProductById(products: ProductRemoveOrderDTO)
 
     fun getAllOrderProductsByIdOrder(id: Long): List<OrderProductResponseDTO>
+
+    fun saveAllOrderProduct(data: List<OrderProductEntity>): List<OrderProductEntity>?
 }

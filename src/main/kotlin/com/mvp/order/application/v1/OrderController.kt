@@ -77,6 +77,7 @@ class OrderController @Autowired constructor(private val orderService: OrderServ
     )
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun deleteOrderProductById(@RequestBody productRemoveOrderDTO: ProductRemoveOrderDTO): ResponseEntity<Unit> {
-        return ResponseEntity.ok(orderService.deleteOrderProductById(productRemoveOrderDTO))
+        orderService.deleteOrderProductById(productRemoveOrderDTO)
+        return ResponseEntity.ok().build()
     }
 }

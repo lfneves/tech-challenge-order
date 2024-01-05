@@ -11,9 +11,7 @@ data class OrderProductEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    @Column(name = "id_product")
     var idProduct: Long? = null,
-    @Column(name = "id_order")
     var idOrder: Long? = null
 ) {
     fun toDTO() : OrderProductDTO {

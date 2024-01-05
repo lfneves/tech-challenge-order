@@ -4,5 +4,5 @@ import com.mvp.order.domain.model.user.UserDTO
 
 fun interface UserService {
 
-    fun getByUsername(username: String): UserDTO
+    fun getByUsername(username: String): UserDTO?
 }

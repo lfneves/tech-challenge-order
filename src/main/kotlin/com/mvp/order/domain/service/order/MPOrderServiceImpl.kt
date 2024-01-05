@@ -3,12 +3,14 @@ package com.mvp.order.domain.service.order
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.mvp.order.domain.configuration.OrderEndpointPropertyConfiguration
 import com.mvp.order.domain.configuration.OrderPropertyConfiguration
+import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.OrderByIdResponseDTO
 import com.mvp.order.domain.model.order.enums.OrderStatusEnum
 import com.mvp.order.domain.model.order.store.*
 import com.mvp.order.domain.model.order.store.webhook.MerchantOrderDTO
 import com.mvp.order.domain.model.order.store.webhook.MerchantOrderResponseDTO
 import com.mvp.order.infrastruture.repository.order.OrderRepository
+import com.mvp.order.utils.constants.ErrorMsgConstants
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
@@ -26,11 +28,16 @@ class MPOrderServiceImpl(
     private val restTemplate = RestTemplate()
 
     override fun checkoutOrder(username: String): QrDataDTO {
-        val orderEntity = orderRepository.findByUsername(username)
-        val orderByIdResponse = orderService.getOrderById(orderEntity.id!!)
-        val jsonRequest = orderCheckoutGenerateQrs(orderByIdResponse)
+        val orderEntityOptional = orderRepository.findByUsernameIfExists(username)
+        return if(orderEntityOptional.isPresent) {
+            val orderEntity = orderEntityOptional.get()
+            val orderByIdResponse = orderService.getOrderById(orderEntity.id!!)
+            val jsonRequest = orderCheckoutGenerateQrs(orderByIdResponse)
 
-        return generateOrderQrs(jsonRequest)
+            generateOrderQrs(jsonRequest)
+        } else {
+            throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
+        }
     }
 
     override fun saveCheckoutOrderExternalStoreID(merchantOrderDTO: MerchantOrderDTO) {

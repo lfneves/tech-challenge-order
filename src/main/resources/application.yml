@@ -13,8 +13,7 @@ spring:
   profiles:
     active: production
   datasource:
-#    url: "${POSTGRES_HOST:jdbc:postgresql://localhost:5432/postgresdb}"
-    url: "jdbc:postgresql://localhost:5432/postgresdb"
+    url: "${POSTGRES_HOST:jdbc:postgresql://localhost:5432/postgresdb}"
     username: "${POSTGRES_USER:postgres}"
     password: "${POSTGRES_PASSWORD:postgres}"
     jpa:

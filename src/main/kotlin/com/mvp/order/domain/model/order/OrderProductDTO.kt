@@ -25,6 +25,13 @@ data class OrderProductResponseDTO(
     var categoryName: String? = null,
     var price: BigDecimal = BigDecimal.ZERO
 ) {
+
+    companion object {
+        fun from(id: Long, idProduct: Long, idOrder: Long, productName: String, categoryName: String, price: BigDecimal): OrderProductResponseDTO {
+            return OrderProductResponseDTO(id, idProduct, idOrder, productName, categoryName, price)
+        }
+    }
+
     fun toEntity() : OrderProductEntity {
         return OrderProductEntity(
             id = this.id,
