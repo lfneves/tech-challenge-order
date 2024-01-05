@@ -11,6 +11,7 @@ import com.mvp.order.infrastruture.repository.order.OrderRepository
 import com.mvp.order.domain.service.message.SnsService
 import com.mvp.order.domain.service.product.ProductServiceImpl
 import com.mvp.order.domain.service.user.UserServiceImpl
+import com.mvp.order.infrastruture.entity.order.OrderEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductEntity
 import com.mvp.order.utils.constants.ErrorMsgConstants
 import org.slf4j.Logger
@@ -34,13 +35,28 @@ class OrderServiceImpl @Autowired constructor(
 
     override fun getOrderById(id: Long): OrderByIdResponseDTO {
         val orderEntity = orderRepository.findByIdOrder(id)
-        
-        val orderResponseDTO = orderEntity.toResponseDTO()
+        return if(orderEntity.isPresent) {
+            val orderResponseDTO = orderEntity.get().toResponseDTO()
+            val orderProducts = findAllByIdOrderInfo(orderResponseDTO.id!!)
+            orderResponseDTO.products.addAll(orderProducts)
+            orderResponseDTO
+        } else {
+            throw Exceptions.RequestedElementNotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
+        }
+    }
 
-        val orderProducts = orderProductRepository.findAllByIdOrderInfo(orderResponseDTO.id!!)
-        orderResponseDTO.products.addAll(orderProducts)
-
-        return orderResponseDTO
+    private fun findAllByIdOrderInfo(id: Long): List<OrderProductResponseDTO> {
+        return orderProductRepository.findAllByIdOrderInfo(id).map {
+            val result = it as Array<Any>
+            OrderProductResponseDTO(
+                id = result[0].toString().toLong(),
+                idProduct = result[1].toString().toLong(),
+                idOrder = result[2].toString().toLong(),
+                productName = result[3].toString(),
+                categoryName = result[4].toString(),
+                price = result[5].toString().toBigDecimal()
+            )
+        }
     }
 
     override fun getOrderByExternalId(externalId: UUID): OrderByIdResponseDTO? {
@@ -60,51 +76,61 @@ class OrderServiceImpl @Autowired constructor(
             total = products.sumOf { it.price }
         }
 
-        val existingOrder = orderRepository.findByUsername(orderRequestDTO.username)
+        val existingOrder = orderRepository.findByUsernameIfExists(orderRequestDTO.username)
+            .orElse(OrderEntity())
         val orderEntity = existingOrder.apply {
-            this.idClient = userDTO?.id
+            if (userDTO != null) {
+                this.idClient = userDTO.id
+            }
+            this.externalId = UUID.randomUUID()
             this.totalPrice = this.totalPrice.add(total)
         }
 
-        val savedOrder = orderRepository.save(orderEntity)
+        val savedOrder = orderRepository.save(orderEntity).toDTO()
         orderRequestDTO.orderProduct.forEach { it.idOrder = savedOrder.id }
-        saveAllOrderProduct(orderRequestDTO.toEntityList())
-        val orderDTO = savedOrder.toDTO().apply {
-            productList.addAll(getAllOrderProductsByIdOrder(savedOrder.id!!))
-        }
-        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(orderDTO)))
-        return OrderResponseDTO(orderDTO)
+        savedOrder.productList = orderProductRepository.saveAll(orderRequestDTO.toEntityList()).toMutableList()
+
+//        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
+        return OrderResponseDTO(savedOrder)
     }
 
     override fun updateOrderProduct(orderRequestDTO: OrderRequestDTO): OrderResponseDTO {
-        val orderEntity = orderRepository.findByUsername(orderRequestDTO.username)
-        logger.info("${orderEntity.status} ${OrderStatusEnum.PAID.value}")
-
-        if (orderEntity.status == OrderStatusEnum.PAID.value) {
-            throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PAID_CONSTANT)
+        val orderEntityOptional = orderRepository.findByUsernameIfExists(orderRequestDTO.username)
+        return if(orderEntityOptional.isPresent) {
+            val orderEntity = orderEntityOptional.get()
+            logger.info("${orderEntity.status} ${OrderStatusEnum.PAID.value}")
+            if (orderEntity.status == OrderStatusEnum.PAID.value) {
+                throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PAID_CONSTANT)
+            }
+            createOrder(orderRequestDTO)
+        } else {
+            throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
         }
-        return createOrder(orderRequestDTO)
     }
 
-    fun saveAllOrderProduct(data: List<OrderProductEntity>): List<OrderProductEntity>? {
+    override fun saveAllOrderProduct(data: List<OrderProductEntity>): List<OrderProductEntity>? {
         return data.let {
             orderProductRepository.saveAll(it).toList()
         }
     }
 
     override fun getAllOrderProductsByIdOrder(id: Long): List<OrderProductResponseDTO> {
-        val orderProducts = orderProductRepository.findAllByIdOrderInfo(id)
-        if (orderProducts.isEmpty()) {
+        val orderEntity = orderRepository.findByIdOrder(id)
+        return if(orderEntity.isPresent) {
+            findAllByIdOrderInfo(orderEntity.get().id!!)
+        } else {
             throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND)
         }
-        return orderProducts.map { it }
     }
 
     override fun deleteOrderById(id: Long) {
-        val order = orderRepository.findByIdOrder(id)
-
-        order.id?.let { orderProductRepository.deleteByIdOrder(it) }
-        orderRepository.deleteById(id)
+        try {
+            orderProductRepository.deleteByIdOrder(id)
+            orderRepository.deleteById(id)
+        } catch (e: Throwable) {
+            logger.error(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND, e.printStackTrace())
+            throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND)
+        }
     }
 
     override fun deleteOrderProductById(products: ProductRemoveOrderDTO) {
@@ -112,7 +138,8 @@ class OrderServiceImpl @Autowired constructor(
             val listProductId = products.orderProductId.toList()
             orderProductRepository.deleteAllById(listProductId)
         } catch (e: Throwable) {
-            throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
+            logger.error(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND, e.printStackTrace())
+            throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND)
         }
     }
 }

@@ -5,6 +5,7 @@ import com.mvp.order.infrastruture.entity.user.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 interface UserRepository : JpaRepository<UserEntity, Long> {
@@ -13,5 +14,5 @@ interface UserRepository : JpaRepository<UserEntity, Long> {
         FROM tb_client 
         INNER JOIN tb_address ON tb_client.id_address = tb_address.id 
         WHERE tb_client.cpf = :username """, nativeQuery = true)
-    fun findByUsernameWithAddress(username: String?): UserEntity
+    fun findByUsernameWithAddress(username: String?): Optional<UserEntity>
 }

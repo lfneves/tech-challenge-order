@@ -1,11 +1,13 @@
 package com.mvp.order.application.unit.order
 
-import com.mvp.order.domain.model.order.OrderByIdResponseDTO
-import com.mvp.order.domain.model.order.OrderRequestDTO
-import com.mvp.order.domain.model.order.OrderResponseDTO
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.mvp.order.domain.model.order.*
+import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
 import com.mvp.order.domain.model.user.UserDTO
 import com.mvp.order.domain.service.message.SnsService
+import com.mvp.order.domain.service.order.OrderService
+import com.mvp.order.domain.service.order.OrderServiceImpl
 import com.mvp.order.domain.service.product.ProductServiceImpl
 import com.mvp.order.domain.service.user.UserServiceImpl
 import com.mvp.order.infrastruture.entity.order.OrderEntity
@@ -13,10 +15,15 @@ import com.mvp.order.infrastruture.entity.order.OrderProductEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductResponseEntity
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
+import io.mockk.*
 import io.mockk.impl.log.Logger
-import io.mockk.mockk
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.*
 
 class OrderUnitTest {
 
@@ -26,11 +33,13 @@ class OrderUnitTest {
     private val userService = mockk<UserServiceImpl>()
     private val orderProductRepository = mockk<OrderProductRepository>()
     private val productService = mockk<ProductServiceImpl>()
-    private val snsService = mockk<SnsService>()
+    private val mapper = mockk<ObjectMapper>()
 
-//    private val orderServiceImpl = OrderServiceImpl(userService, productService, snsService)
+    private lateinit var orderService: OrderService
+    private lateinit var snsService: SnsService
 
-    private lateinit var orderProducts: MutableList<OrderProductResponseEntity>
+    private lateinit var orderProducts: MutableList<OrderProductResponseDTO>
+    private lateinit var orderProductsEntity: MutableList<OrderProductResponseEntity>
     private lateinit var orderByIdResponseDTO: OrderByIdResponseDTO
     private lateinit var orderEntity: OrderEntity
     private lateinit var orderRequestDTO: OrderRequestDTO
@@ -43,61 +52,110 @@ class OrderUnitTest {
     private var orderId = 1L
     private val zonedDateTime = ZonedDateTime.now(ZoneId.of( "America/Sao_Paulo")).toLocalDateTime()
 
-//    @BeforeEach
-//    fun setup() {
-//        orderProducts = mutableListOf(OrderProductResponseEntity(
-//            id = 1,
-//            idProduct = 1,
-//            idOrder = 1,
-//            productName = "Suco",
-//            categoryName = "Bebidas",
-//            price = BigDecimal.ZERO
-//        ))
-//        orderByIdResponseDTO = OrderByIdResponseDTO(
-//            id = 1,
-//            externalId = UUID.randomUUID(),
-//            idClient = 1,
-//            totalPrice = BigDecimal.TEN,
-//            status = "PENDING",
-//            waitingTime = zonedDateTime,
-//            isFinished = false,
-//            products = orderProducts
-//        )
-//        orderEntity = OrderEntity(
-//            id = 1,
-//            externalId = UUID.randomUUID(),
-//            idClient = 1,
-//            totalPrice = BigDecimal.TEN,
-//            status = "PENDING",
-//            waitingTime = zonedDateTime,
-//            isFinished = false
-//        )
-//        val orderProductDTO = OrderProductDTO(
-//            id = 1,
-//            idProduct = 1,
-//            idOrder = 1
-//        )
-//
-//        orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
-//        userDTO = UserDTO(
-//            id = 1,
-//            name = "Test User",
-//            email = "test@example.com",
-//            password = "password123",
-//            cpf = "99999999999"
-//        )
-//        product = ProductDTO(
-//            id = 1L,
-//            name = "Suco",
-//            price = BigDecimal(19.99),
-//            quantity = 5,
-//            idCategory = 2L,
-//            category = CategoryDTO(id = 1, name = "Bebidas", description = "Água, Refrigerante, Cerveja entre outros.")
-//        )
-//        productDTOList = listOf(product)
-//        orderProductEntity = OrderProductEntity(id = 1L, idProduct = 1L, idOrder = 1L)
-//        orderResponseDTO = OrderResponseDTO(orderEntity.toDTO())
-//    }
+    @BeforeEach
+    fun setup() {
+        snsService = mockk(relaxed = true)
+        orderService = OrderServiceImpl(snsService, orderRepository, orderProductRepository, productService, userService)
+
+        orderProductsEntity = mutableListOf(OrderProductResponseEntity(
+            id = 1,
+            idProduct = 1,
+            idOrder = 1,
+            productName = "Suco",
+            categoryName = "Bebidas",
+            price = BigDecimal.ZERO
+        ))
+        orderProducts = mutableListOf(OrderProductResponseDTO(
+            id = 1,
+            idProduct = 1,
+            idOrder = 1,
+            productName = "Suco",
+            categoryName = "Bebidas",
+            price = BigDecimal.ZERO
+        ))
+        orderByIdResponseDTO = OrderByIdResponseDTO(
+            id = 1,
+            externalId = UUID.randomUUID(),
+            idClient = 1,
+            totalPrice = BigDecimal.TEN,
+            status = "PENDING",
+            waitingTime = zonedDateTime,
+            isFinished = false,
+            products = orderProducts
+        )
+        orderEntity = OrderEntity(
+            id = 1,
+            externalId = UUID.randomUUID(),
+            idClient = 1,
+            totalPrice = BigDecimal.TEN,
+            status = "PENDING",
+            waitingTime = zonedDateTime,
+            isFinished = false
+        )
+        val orderProductDTO = OrderProductDTO(
+            id = 1,
+            idProduct = 1,
+            idOrder = 1
+        )
+
+        orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
+        userDTO = UserDTO(
+            id = 1,
+            name = "Test User",
+            email = "test@example.com",
+            password = "password123",
+            cpf = "99999999999"
+        )
+        product = ProductDTO(
+            id = 1L,
+            name = "Suco",
+            price = BigDecimal(19.99),
+            quantity = 5,
+            idCategory = 2L,
+            category = CategoryDTO(id = 1, name = "Bebidas", description = "Água, Refrigerante, Cerveja entre outros.")
+        )
+        productDTOList = listOf(product)
+        orderProductEntity = OrderProductEntity(id = 1L, idProduct = 1L, idOrder = 1L)
+        orderResponseDTO = OrderResponseDTO(orderEntity.toDTO())
+    }
+
+    @Test
+    fun `test createOrder with valid data`() {
+        // Prepare input
+        val orderRequestDTO = orderRequestDTO
+
+        // Mock userService response
+        val userDTO = userDTO
+            every { userService.getByUsername(any()) } returns userDTO
+
+        // Mock productService response
+        val products = productDTOList
+            every { productService.getAllById(any()) } returns products
+
+        // Mock orderRepository responses
+        val existingOrder = orderEntity
+            every { orderRepository.findByUsername(any()) } returns existingOrder
+        every { orderRepository.save(any()) } answers { firstArg() }
+
+        val listOrderProductEntity = listOf(OrderProductEntity(id = 1L, idProduct = 1L, idOrder = 1L))
+
+        // Mock orderProductRepository response
+        every { orderProductRepository.saveAll(listOrderProductEntity) } answers { firstArg() }
+
+        every { snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(orderEntity.toDTO()))) } just Runs
+
+        // Perform the test
+        val result = orderService.createOrder(orderRequestDTO)
+
+        // Assertions and verification
+        assertNotNull(result)
+        verify(exactly = 1) { userService.getByUsername(orderRequestDTO.username) }
+        verify(exactly = 1) { productService.getAllById(any()) }
+        verify(exactly = 1) { orderRepository.findByUsername(any()) }
+        verify(exactly = 1) { orderRepository.save(any()) }
+//        verify(exactly = 1) { orderProductRepository.saveAll(any()) }
+    }
+
 //
 //    @Test
 //    fun getOrderById() {

@@ -1,14 +1,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: delivery
+  name: order-ws
 spec:
   minReplicas: 1
   maxReplicas: 1
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: delivery
+    name: order-ws
   metrics:
     - type: Resource
       resource:

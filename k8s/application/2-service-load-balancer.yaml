@@ -1,14 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: delivery
+  name: order-ws
   labels:
-    app: delivery
-#  annotations:
-#    kubernetes.io/ingress.class: alb
+    app: order-ws
 spec:
   selector:
-    app: delivery
+    app: order-ws
   type: LoadBalancer
   ports:
     - name: http
