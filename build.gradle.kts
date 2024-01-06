@@ -48,14 +48,8 @@ dependencies {
 	// PostgreSQL
 //	implementation("org.postgresql:postgresql:42.7.1")
 
-//	implementation("io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE")
-
 	// H2
 //	implementation("io.r2dbc:r2dbc-h2:1.0.0.RELEASE")
-
-	// Coroutines and Reactor not used yet! (used to more imperative reactive programing with suspend functions)
-//	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-//	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1")
 
 	// Mercado Pago SDK
 	implementation("com.mercadopago:sdk-java:2.1.14")

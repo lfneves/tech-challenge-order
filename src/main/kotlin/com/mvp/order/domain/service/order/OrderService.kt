@@ -9,6 +9,8 @@ interface OrderService {
 
     fun getOrderById(id: Long): OrderByIdResponseDTO
 
+    fun findAllByIdOrderInfo(id: Long): List<OrderProductResponseDTO>
+
     fun getOrderByExternalId(externalId: UUID): OrderByIdResponseDTO?
 
     fun createOrder(orderRequestDTO: OrderRequestDTO): OrderResponseDTO

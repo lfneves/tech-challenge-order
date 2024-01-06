@@ -13,6 +13,7 @@ import com.mvp.order.domain.service.product.ProductServiceImpl
 import com.mvp.order.domain.service.user.UserServiceImpl
 import com.mvp.order.infrastruture.entity.order.OrderEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductEntity
+import com.mvp.order.infrastruture.repository.order.OrderProductResponseRepository
 import com.mvp.order.utils.constants.ErrorMsgConstants
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,6 +27,7 @@ class OrderServiceImpl @Autowired constructor(
     private val snsService: SnsService,
     private val orderRepository: OrderRepository,
     private val orderProductRepository: OrderProductRepository,
+    private val orderProductResponseRepository: OrderProductResponseRepository,
     private val productService: ProductServiceImpl,
     private val userService: UserServiceImpl
 ): OrderService {
@@ -45,17 +47,20 @@ class OrderServiceImpl @Autowired constructor(
         }
     }
 
-    private fun findAllByIdOrderInfo(id: Long): List<OrderProductResponseDTO> {
-        return orderProductRepository.findAllByIdOrderInfo(id).map {
-            val result = it as Array<Any>
-            OrderProductResponseDTO(
-                id = result[0].toString().toLong(),
-                idProduct = result[1].toString().toLong(),
-                idOrder = result[2].toString().toLong(),
-                productName = result[3].toString(),
-                categoryName = result[4].toString(),
-                price = result[5].toString().toBigDecimal()
-            )
+    override fun findAllByIdOrderInfo(id: Long): List<OrderProductResponseDTO> {
+        return orderProductResponseRepository.findAllByIdOrderInfo(id).mapNotNull { entity ->
+            try {
+                OrderProductResponseDTO(
+                    id = entity.id,
+                    idProduct = entity.idProduct,
+                    idOrder = entity.idOrder,
+                    productName = entity.productName,
+                    categoryName = entity.categoryName,
+                    price = entity.price
+                )
+            } catch (e: Exception) {
+                throw Exceptions.RequestedElementNotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package com.mvp.order.application.unit.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
+import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.domain.model.user.UserDTO
 import com.mvp.order.domain.service.message.SnsService
 import com.mvp.order.domain.service.order.OrderService
@@ -14,10 +16,12 @@ import com.mvp.order.infrastruture.entity.order.OrderEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductEntity
 import com.mvp.order.infrastruture.entity.order.OrderProductResponseEntity
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
+import com.mvp.order.infrastruture.repository.order.OrderProductResponseRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
+import com.mvp.order.utils.constants.ErrorMsgConstants
 import io.mockk.*
 import io.mockk.impl.log.Logger
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -32,6 +36,7 @@ class OrderUnitTest {
     private val orderRepository = mockk<OrderRepository>()
     private val userService = mockk<UserServiceImpl>()
     private val orderProductRepository = mockk<OrderProductRepository>()
+    private val orderProductResponseRepository = mockk<OrderProductResponseRepository>()
     private val productService = mockk<ProductServiceImpl>()
     private val mapper = mockk<ObjectMapper>()
 
@@ -48,6 +53,7 @@ class OrderUnitTest {
     private lateinit var orderResponseDTO: OrderResponseDTO
     private lateinit var product: ProductDTO
     private lateinit var orderProductEntity: OrderProductEntity
+    private lateinit var orderProductResponseEntity: OrderProductResponseEntity
 
     private var orderId = 1L
     private val zonedDateTime = ZonedDateTime.now(ZoneId.of( "America/Sao_Paulo")).toLocalDateTime()
@@ -55,7 +61,16 @@ class OrderUnitTest {
     @BeforeEach
     fun setup() {
         snsService = mockk(relaxed = true)
-        orderService = OrderServiceImpl(snsService, orderRepository, orderProductRepository, productService, userService)
+        orderService = OrderServiceImpl(snsService, orderRepository, orderProductRepository, orderProductResponseRepository, productService, userService)
+
+        orderProductResponseEntity = OrderProductResponseEntity(
+            id = 1,
+            idProduct = 1,
+            idOrder = 1,
+            productName = "Suco",
+            categoryName = "Bebidas",
+            price = BigDecimal.ZERO
+        )
 
         orderProductsEntity = mutableListOf(OrderProductResponseEntity(
             id = 1,
@@ -75,7 +90,7 @@ class OrderUnitTest {
         ))
         orderByIdResponseDTO = OrderByIdResponseDTO(
             id = 1,
-            externalId = UUID.randomUUID(),
+            externalId = UUID.fromString("4879d212-bdf1-413c-9fd1-5b65b50257bc"),
             idClient = 1,
             totalPrice = BigDecimal.TEN,
             status = "PENDING",
@@ -85,7 +100,7 @@ class OrderUnitTest {
         )
         orderEntity = OrderEntity(
             id = 1,
-            externalId = UUID.randomUUID(),
+            externalId = UUID.fromString("4879d212-bdf1-413c-9fd1-5b65b50257bc"),
             idClient = 1,
             totalPrice = BigDecimal.TEN,
             status = "PENDING",
@@ -124,24 +139,18 @@ class OrderUnitTest {
         // Prepare input
         val orderRequestDTO = orderRequestDTO
 
-        // Mock userService response
-        val userDTO = userDTO
-            every { userService.getByUsername(any()) } returns userDTO
-
-        // Mock productService response
-        val products = productDTOList
-            every { productService.getAllById(any()) } returns products
-
-        // Mock orderRepository responses
-        val existingOrder = orderEntity
-            every { orderRepository.findByUsername(any()) } returns existingOrder
+        // Mock response
+        every { userService.getByUsername(any()) } returns userDTO
+        every { productService.getAllById(any()) } returns productDTOList
+        every { orderRepository.findByUsername(any()) } returns orderEntity
         every { orderRepository.save(any()) } answers { firstArg() }
 
         val listOrderProductEntity = listOf(OrderProductEntity(id = 1L, idProduct = 1L, idOrder = 1L))
 
+        every { orderRepository.findByUsernameIfExists(orderRequestDTO.username) } returns Optional.of(orderEntity)
+
         // Mock orderProductRepository response
         every { orderProductRepository.saveAll(listOrderProductEntity) } answers { firstArg() }
-
         every { snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(orderEntity.toDTO()))) } just Runs
 
         // Perform the test
@@ -151,158 +160,105 @@ class OrderUnitTest {
         assertNotNull(result)
         verify(exactly = 1) { userService.getByUsername(orderRequestDTO.username) }
         verify(exactly = 1) { productService.getAllById(any()) }
-        verify(exactly = 1) { orderRepository.findByUsername(any()) }
+        verify(exactly = 1) { orderRepository.findByUsernameIfExists(any()) }
         verify(exactly = 1) { orderRepository.save(any()) }
-//        verify(exactly = 1) { orderProductRepository.saveAll(any()) }
     }
 
-//
-//    @Test
-//    fun getOrderById() {
-//
-//        every { orderRepository.findByIdOrder(orderId) } returns Mono.just(orderEntity)
-//        every { orderProductRepository.findAllByIdOrderInfo(orderId) } returns Flux.fromIterable(orderProducts)
-//
-//        val result = orderServiceImpl.getOrderById(orderId)
-//
-//        StepVerifier.create(result)
-//            .expectNextMatches { response ->
-//                response.id == orderByIdResponseDTO.id &&
-//                        response.idClient == orderByIdResponseDTO.idClient &&
-//                        response.totalPrice == orderByIdResponseDTO.totalPrice &&
-//                        response.status == orderByIdResponseDTO.status &&
-//                        response.isFinished == orderByIdResponseDTO.isFinished &&
-//                        // Dynamic values check only the structure or format, not the exact value
-//                        response.externalId.toString().matches(Regex("[a-f0-9-]{36}")) &&
-//                        response.waitingTime.toString().matches(Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+"))
-//                // lists check the size or contents as needed
-//                response.products.size == orderByIdResponseDTO.products.size
-//            }
-//            .verifyComplete()
-//    }
-//
-//    @Test
-//    fun getOrderByExternalId() {
-//        val externalId = UUID.randomUUID()
-//        val expectedOrder = orderEntity
-//        val expectedDto = expectedOrder.toResponseDTO()
-//
-//        coEvery { orderRepository.findByExternalId(externalId) } returns Mono.just(expectedOrder)
-//
-//        runBlocking {
-//            val result = orderServiceImpl.getOrderByExternalId(externalId)
-//            assertEquals(expectedDto, result)
-//        }
-//    }
-//
-//    @Test
-//    fun createOrder() {
-//        val orderServiceImplMockk = mockk<OrderServiceImpl>()
-//        every { userService.getByUsername(orderRequestDTO.username) } returns Mono.just(userDTO)
-//        every { productService.getAllById(listOf(1L)) } returns Flux.just(product)
-//        every { orderRepository.findByUsername(orderRequestDTO.username) } returns Mono.just(orderEntity)
-////        every { orderProductRepository.save(any()) } returns Mono.just(orderProductEntity)
-//        every { orderRepository.save(orderEntity) } returns Mono.just(orderEntity)
-////        every { orderServiceImplMockk.saveAllOrderProduct(listOf(orderProductEntity)) } returns Flux.just(orderProductEntity)
-//
-//        val result = orderServiceImpl.createOrder(orderRequestDTO)
-//
-//        result.subscribe { response ->
-//            assertEquals(orderResponseDTO, response)
-//        }
-//    }
-//
-//    @Test
-//    fun updateOrderProduct() {
-//        every { userService.getByUsername(orderRequestDTO.username) } returns Mono.just(userDTO)
-//        every { orderRepository.findByUsername(orderRequestDTO.username) } returns Mono.just(orderEntity)
-//        every { orderServiceImpl.createOrder(orderRequestDTO) } returns Mono.just(orderResponseDTO)
-//
-//        StepVerifier.create(orderServiceImpl.updateOrderProduct(orderRequestDTO))
-//            .expectNextMatches{ response ->
-//                response.orderDTO?.id == orderResponseDTO.orderDTO?.id
-//                        && response.orderDTO?.status == orderResponseDTO.orderDTO?.status
-//                        && response.orderDTO?.externalId == orderResponseDTO.orderDTO?.externalId
-//                        && response.orderDTO?.isFinished == orderResponseDTO.orderDTO?.isFinished
-//            }.expectComplete()
-//
-//        verify(exactly = 1) { orderRepository.findByUsername(orderRequestDTO.username) }
-//    }
-//
-//    @Test
-//    fun deleteOrderById() {
-//        val orderId = 1L
-//        val monoVoid: Mono<Void> = Mono.empty()
-//
-//        // Mocking behavior
-//        every { orderRepository.findByIdOrder(orderId) } returns Mono.just(orderEntity)
-//        every { orderProductRepository.deleteByIdOrder(orderId) } returns monoVoid
-//        every { orderRepository.deleteById(orderId) } returns monoVoid
-//
-//        // Call the method
-//        val result = orderServiceImpl.deleteOrderById(orderId)
-//
-//        // Verify the result
-//        StepVerifier.create(result)
-//            .verifyComplete()
-//
-//        // Verify interactions with mocks
-//        verify { orderRepository.findByIdOrder(orderId) }
-//        verify { orderProductRepository.deleteByIdOrder(orderId) }
-//        verify { orderRepository.deleteById(orderId) }
-//    }
-//
-//    @Test
-//    fun deleteOrderProductById() {
-//        val productRemoveOrderDTO = ProductRemoveOrderDTO(orderRequestDTO.username, mutableListOf(1L))
-//        val listProductId = productRemoveOrderDTO.orderProductId.map { it }.toList()
-//
-//        every { orderProductRepository.deleteById(listProductId) } returns Mono.error(
-//            Exceptions.NotFoundException(
-//            ErrorMsgConstants.ERROR_ORDER_NOT_FOUND))
-//
-//        val result = orderServiceImpl.deleteOrderProductById(productRemoveOrderDTO)
-//
-//        StepVerifier.create(result)
-//            .expectErrorMatches { it is Exceptions.NotFoundException && it.message == ErrorMsgConstants.ERROR_ORDER_NOT_FOUND }
-//            .verify()
-//
-//        // Verify interactions with the mock
-//        verify(exactly = 1) { orderProductRepository.deleteById(listProductId) }
-//    }
-//
-//    @Test
-//    fun getAllOrderProductsByIdOrder() {
-//        val id = 123L
-//        every { orderProductRepository.findAllByIdOrderInfo(id) } returns Flux.fromIterable(orderProducts)
-//
-//        val result = orderServiceImpl.getAllOrderProductsByIdOrder(id)
-//
-//        StepVerifier.create(result)
-//            .expectNextMatches { it.id == orderProducts.get(0).id }
-//            .verifyComplete()
-//
-//        // Verify interactions with the mock
-//        verify(exactly = 1) { orderProductRepository.findAllByIdOrderInfo(id) }
-//    }
-//
-//    @Test
-//    fun fakeCheckoutOrder() {
-//        val orderCheckoutDTO = OrderCheckoutDTO(idOrder = 123L) // Replace with actual data
-//
-//        every { orderRepository.findByIdOrder(orderCheckoutDTO.idOrder) } returns Mono.just(orderEntity)
-//        every { orderRepository.save(any()) } answers { Mono.just(firstArg()) }
-//
-//        val result = orderServiceImpl.fakeCheckoutOrder(orderCheckoutDTO)
-//
-//        // Verify results
-//        StepVerifier.create(result)
-//            .expectNext(true)
-//            .verifyComplete()
-//
-//        // Verify interactions with the mock
-//        verify(exactly = 1) { orderRepository.findByIdOrder(orderCheckoutDTO.idOrder) }
-//        verify(exactly = 1) { orderRepository.save(any()) }
-//    }
 
+    @Test
+    fun getOrderById() {
+        val orderId = 1L
+
+        every { orderProductResponseRepository.findAllByIdOrderInfo(orderId) } returns listOf(orderProductResponseEntity)
+        every { orderRepository.findByIdOrder(orderId) } returns Optional.of(orderEntity)
+
+        // Act
+        val result = orderService.getOrderById(orderId)
+
+        // Assert
+        assertNotNull(result)
+        assertEquals(orderByIdResponseDTO, result)
+    }
+
+    @Test
+    fun getOrderByExternalId() {
+        val expectedOrder = orderByIdResponseDTO
+
+        every { orderRepository.findByExternalId(orderEntity.externalId.toString()) } returns orderEntity
+
+        val result = orderService.getOrderByExternalId(orderEntity.externalId!!)
+        result?.products?.addAll(orderProducts)
+
+        // Assert
+        assertEquals(expectedOrder, result)
+    }
+
+    @Test
+    fun updateOrderProduct() {
+        val expectedResponse = orderResponseDTO
+
+        val mockOrderEntity = orderEntity
+        val mockOptional = mockk<Optional<OrderEntity>>()
+
+        every { userService.getByUsername(any()) } returns userDTO
+        every { productService.getAllById(any()) } returns productDTOList
+        every { orderRepository.findByUsername(any()) } returns orderEntity
+        every { orderRepository.save(any()) } answers { firstArg() }
+
+        every { mockOptional.isPresent } returns false
+        every { mockOptional.orElse(any()) } answers { firstArg() }
+        every { orderRepository.findByUsernameIfExists(any()) } returns mockOptional
+
+        val orderProductEntitiesSlot = slot<List<OrderProductEntity>>()
+        every { orderProductRepository.saveAll(capture(orderProductEntitiesSlot)) } answers { orderProductEntitiesSlot.captured }
+
+        every { mockOptional.isPresent } returns true
+        every { mockOptional.get() } returns mockOrderEntity
+        every { orderRepository.findByUsernameIfExists(any()) } returns mockOptional
+
+        // Act
+        val result = orderService.updateOrderProduct(orderRequestDTO)
+
+        // Assert
+        assertNotNull(result)
+        assertNotEquals(expectedResponse, result)
+    }
+
+    @Test
+    fun deleteOrderById() {
+        val orderId = 1L
+
+        // Mocking behavior
+        every { orderRepository.findByIdOrder(orderId) } returns Optional.of(orderEntity)
+        coEvery { orderProductRepository.deleteByIdOrder(orderId) } returns 1
+        every { orderRepository.deleteById(orderId) } just runs
+
+        // Act
+        orderService.deleteOrderById(orderId)
+
+        // Verify interactions with mocks
+        verify { orderProductRepository.deleteByIdOrder(orderId) }
+        verify { orderRepository.deleteById(orderId) }
+    }
+
+    @Test
+    fun deleteOrderProductById() {
+        every { orderProductRepository.deleteAllById(any()) } just runs
+
+        orderService.deleteOrderProductById(ProductRemoveOrderDTO(orderRequestDTO.username, mutableListOf(1L)))
+
+        verify { orderProductRepository.deleteAllById(listOf(1L)) }
+    }
+
+    @Test
+    fun getAllOrderProductsByIdOrder() {
+        val id = 1L
+        every { orderProductResponseRepository.findAllByIdOrderInfo(id) } returns orderProductsEntity.toList()
+        every { orderRepository.findByIdOrder(orderId) } returns Optional.of(orderEntity)
+
+        val expectedResponse = orderProducts
+
+        val result = orderService.getAllOrderProductsByIdOrder(id)
+        assertEquals(expectedResponse, result)
+    }
 }
