@@ -28,7 +28,7 @@ class ProductController(private val productService: ProductService) {
         description = "Busca produtos cadastrados pelo id informado",
         tags = ["Produtos"]
     )
-    fun getProductById(@PathVariable id: Int): ProductDTO {
+    fun getProductById(@PathVariable id: Long): ProductDTO {
         return productService.getProductById(id)
     }
 

@@ -48,7 +48,7 @@ class OrderServiceImpl @Autowired constructor(
     }
 
     override fun findAllByIdOrderInfo(id: Long): List<OrderProductResponseDTO> {
-        return orderProductResponseRepository.findAllByIdOrderInfo(id).mapNotNull { entity ->
+        return orderProductResponseRepository.findAllByIdOrderInfo(id).map { entity ->
             try {
                 OrderProductResponseDTO(
                     id = entity.id,

@@ -14,13 +14,8 @@ class ProductServiceImpl(
     private val categoryRepository: CategoryRepository
 ): ProductService {
 
-//    @Autowired
-//    private lateinit var productRepository: ProductRepository
-//    @Autowired
-//    private lateinit var categoryRepository: CategoryRepository
-
-    override fun getProductById(id: Int): ProductDTO {
-        val product = productRepository.findById(id.toLong())
+    override fun getProductById(id: Long): ProductDTO {
+        val product = productRepository.findById(id)
             .orElseThrow { Exceptions.NotFoundException(ErrorMsgConstants.ERROR_PRODUCT_NOT_FOUND) }
 
         val category = categoryRepository.findById(product?.idCategory!!)

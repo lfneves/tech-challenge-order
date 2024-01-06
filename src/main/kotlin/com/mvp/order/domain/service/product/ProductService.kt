@@ -5,7 +5,7 @@ import java.math.BigDecimal
 
 interface ProductService {
 
-    fun getProductById(id: Int): ProductDTO
+    fun getProductById(id: Long): ProductDTO
 
     fun getProducts(): List<ProductDTO>
 

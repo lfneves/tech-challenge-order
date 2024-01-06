@@ -1,7 +1,6 @@
 package com.mvp.order.application.unit.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
@@ -18,9 +17,7 @@ import com.mvp.order.infrastruture.entity.order.OrderProductResponseEntity
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
 import com.mvp.order.infrastruture.repository.order.OrderProductResponseRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
-import com.mvp.order.utils.constants.ErrorMsgConstants
 import io.mockk.*
-import io.mockk.impl.log.Logger
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,8 +27,6 @@ import java.time.ZonedDateTime
 import java.util.*
 
 class OrderUnitTest {
-
-    private val logger: Logger = mockk(relaxed = true)
 
     private val orderRepository = mockk<OrderRepository>()
     private val userService = mockk<UserServiceImpl>()
