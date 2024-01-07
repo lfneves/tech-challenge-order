@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class UserServiceImpl: UserService {
-
-    @Autowired
-    private lateinit var userRepository: UserRepository
+class UserServiceImpl(
+    private val userRepository: UserRepository
+): UserService {
 
     @Autowired
     private lateinit var addressRepository: AddressRepository

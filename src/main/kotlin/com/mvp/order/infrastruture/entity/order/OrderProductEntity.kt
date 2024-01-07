@@ -23,7 +23,9 @@ data class OrderProductEntity(
     }
 }
 
+@Entity
 data class OrderProductResponseEntity(
+    @Id
     var id: Long? = null,
     var idProduct: Long? = null,
     var idOrder: Long? = null,

@@ -81,4 +81,5 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	enabled = true
 	useJUnitPlatform()
+	include("com/mvp/order/application/unit/**")
 }
