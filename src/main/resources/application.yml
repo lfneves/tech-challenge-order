@@ -38,4 +38,5 @@ order:
   api-endpoints:
     qrs: "instore/orders/qr/seller/collectors/?/pos/?/qrs"
   sns:
-    topicArn: "${TOPIC_ORDER_SNS:arn:aws:sns:us-east-1:566907801160:ORDER_TOPIC}"
+#    topicArn: "${TOPIC_ORDER_SNS:arn:aws:sns:us-east-1:566907801160:ORDER_TOPIC}"
+    topicArn: "${TOPIC_ORDER_SNS:localhost:4566:ORDER_TOPIC}"

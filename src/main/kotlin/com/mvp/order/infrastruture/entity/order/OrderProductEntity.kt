@@ -30,6 +30,7 @@ data class OrderProductResponseEntity(
     var idProduct: Long? = null,
     var idOrder: Long? = null,
     var productName: String? = null,
+    @Column(name = "categoryName")
     var categoryName: String? = null,
     var price: BigDecimal = BigDecimal.ZERO
 ) {

@@ -16,6 +16,6 @@ interface ProductRepository : JpaRepository<ProductEntity, Long> {
     @Query("SELECT id, name, price, quantity, id_category FROM tb_product WHERE id = :ids", nativeQuery = true)
     fun findAllProductById(ids: Iterable<Long>): List<ProductEntity>
 
-    @Query("SELECT SUM(price) AS price FROM tb_product WHERE id IN(:ids)", nativeQuery = true)
+    @Query("SELECT id, SUM(price) AS price FROM tb_product WHERE id IN(:ids) GROUP BY id", nativeQuery = true)
     fun findByIdTotalPrice(ids: List<Long?>): ProductEntity
 }

@@ -50,7 +50,7 @@ interface OrderRepository : JpaRepository<OrderEntity, Long> {
          INNER JOIN tb_client ON tb_client.id = tb_order.id_client
          INNER JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
          INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
-         WHERE tb_order.external_id = :externalId
+         WHERE tb_order.external_id = CAST(:externalId AS UUID)
          GROUP BY tb_order.id, id_client, status, is_finished
     """, nativeQuery = true)
     fun findByExternalId(@Param("externalId") externalId: String): OrderEntity

@@ -11,8 +11,8 @@ interface OrderProductResponseRepository : JpaRepository<OrderProductResponseEnt
         SELECT tb_order_product.id, 
                tb_order_product.id_product, 
                tb_order_product.id_order, 
-               tb_product.name AS productName, 
-               tb_category.name AS categoryName, 
+               tb_product.name AS product_name, 
+               tb_category.name AS category_name, 
                tb_product.price
         FROM tb_order_product
         INNER JOIN tb_order ON tb_order.id = tb_order_product.id_order
