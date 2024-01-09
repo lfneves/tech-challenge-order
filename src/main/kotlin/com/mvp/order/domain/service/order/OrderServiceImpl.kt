@@ -65,7 +65,7 @@ class OrderServiceImpl @Autowired constructor(
     }
 
     override fun getOrderByExternalId(externalId: UUID): OrderByIdResponseDTO? {
-        return orderRepository.findByExternalId(externalId.toString()).toResponseDTO()
+        return orderRepository.findByExternalId(externalId.toString())?.toResponseDTO()
     }
 
     override fun createOrder(orderRequestDTO: OrderRequestDTO): OrderResponseDTO {
@@ -89,6 +89,7 @@ class OrderServiceImpl @Autowired constructor(
             }
             this.externalId = UUID.randomUUID()
             this.totalPrice = this.totalPrice.add(total)
+            this.status = OrderStatusEnum.PENDING.value
         }
 
         val savedOrder = orderRepository.save(orderEntity).toDTO()

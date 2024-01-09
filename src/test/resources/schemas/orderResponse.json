@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "orderDTO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "idClient": {
+          "type": "integer"
+        },
+        "totalPrice": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "waitingTime": {
+          "type": "string"
+        },
+        "isFinished": {
+          "type": "boolean"
+        },
+        "productList": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "idProduct": {
+                  "type": "integer"
+                },
+                "idOrder": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "idProduct",
+                "idOrder"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "externalId",
+        "idClient",
+        "totalPrice",
+        "status",
+        "waitingTime",
+        "isFinished",
+        "productList"
+      ]
+    }
+  },
+  "required": [
+    "orderDTO"
+  ]
+}

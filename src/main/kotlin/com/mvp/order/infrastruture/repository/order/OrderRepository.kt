@@ -53,7 +53,7 @@ interface OrderRepository : JpaRepository<OrderEntity, Long> {
          WHERE tb_order.external_id = CAST(:externalId AS UUID)
          GROUP BY tb_order.id, id_client, status, is_finished
     """, nativeQuery = true)
-    fun findByExternalId(@Param("externalId") externalId: String): OrderEntity
+    fun findByExternalId(@Param("externalId") externalId: String): OrderEntity?
 
     @Modifying
     @Query(value = "UPDATE tb_order SET status = :status WHERE id = :id", nativeQuery = true)
