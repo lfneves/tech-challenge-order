@@ -70,6 +70,5 @@ class ProductServiceImpl(
         } catch (e: EmptyResultDataAccessException) {
             listOf()
         }
-
     }
 }
