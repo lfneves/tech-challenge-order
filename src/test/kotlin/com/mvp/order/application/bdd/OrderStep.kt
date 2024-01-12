@@ -1,6 +1,5 @@
 package com.mvp.order.application.bdd
 
-import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.domain.service.order.OrderService
@@ -49,6 +48,7 @@ class OrderStep {
 
     @When("I create an order for {string} with products {string}")
     fun iCreateAnOrderForUserWithProducts(username: String, productIds: String) {
+        orderRequest.username = username
         result = orderService.createOrder(orderRequest)
     }
 
@@ -64,15 +64,12 @@ class OrderStep {
 
     // get order by ID
     // Scenario 1
-    @Given("an order exists with ID {long}")
-    fun anOrderExistsWithId(id: Long) {
-        result = orderService.createOrder(orderRequest)
-    }
-
-    @When("I retrieve the order with ID {long}")
-    fun iRetrieveTheOrderWithId(id: Long) {
+    @When("I retrieve the order id with username {string}")
+    fun iRetrieveTheOrderWithId(username: String) {
         try {
-            retrievedOrder = orderService.getOrderById(result.orderDTO?.id!!)
+            val order = orderRepository.findByUsernameIfExists(username)
+            val idOrder = order.get().id!!
+            retrievedOrder = orderService.getOrderById(idOrder)
         } catch (e: Exception) {
             retrievalError = e
         }
@@ -197,23 +194,26 @@ class OrderStep {
         }
     }
 
-    // Delete order products by IDs
-//    @When("I delete the order for {string} products with IDs {string}")
-//    fun iDeleteTheOrderProductsWithIds(username: String, ids: String) {
-//        val productIds = ids.split(", ").map { it.toLong() }.toMutableList()
-//        val productRemoveOrderDTO = ProductRemoveOrderDTO(username, orderProductId = productIds)
-//        try {
-//            orderService.deleteOrderProductById(productRemoveOrderDTO)
-//        } catch (e: Exception) {
-//            retrievalError = e
-//        }
-//    }
+//     Delete order products by IDs
+    @When("I delete the order by username {string} products with IDs {string}")
+    fun iDeleteTheOrderProductsWithIds(username: String, ids: String) {
+        val productIds = ids.split(", ").map { it.toLong() }.toMutableList()
+        val order = orderRepository.findByUsernameIfExists(username)
+        val idOrder = order.get().id!!
+        val productRemoveOrderDTO = ProductRemoveOrderDTO(idOrder, orderProductId = productIds)
+        try {
+            orderService.deleteOrderProductById(productRemoveOrderDTO)
+        } catch (e: Exception) {
+            retrievalError = e
+        }
+    }
 
-    @Then("the order products should be successfully deleted")
-    fun theOrderProductsShouldBeSuccessfullyDeleted() {
-        assertNull(retrievalError)
-        retrievedProducts = orderService.getAllOrderProductsByIdOrder(result.orderDTO?.id!!)
-        assertEquals(0, retrievedProducts!!.size)
+    @Then("the order products should be successfully deleted by username {string} and with remaining one product")
+    fun theOrderProductsShouldBeSuccessfullyDeleted(username: String) {
+        val order = orderRepository.findByUsernameIfExists(username)
+        val idOrder = order.get().id!!
+        retrievedProducts = orderService.getAllOrderProductsByIdOrder(idOrder)
+        assertEquals(1, retrievedProducts!!.size)
     }
 
     // Delete order by ID
@@ -221,6 +221,17 @@ class OrderStep {
     fun deleteTheOrder() {
         try {
             orderService.deleteOrderById(result.orderDTO?.id!!)
+        } catch (e: Exception) {
+            retrievalError = e
+        }
+    }
+
+    @When("Delete the order by username {string}")
+    fun deleteTheOrderByUsername(username: String) {
+        try {
+            val order = orderRepository.findByUsernameIfExists(username)
+            val idOrder = order.get().id!!
+            orderService.deleteOrderById(idOrder)
         } catch (e: Exception) {
             retrievalError = e
         }

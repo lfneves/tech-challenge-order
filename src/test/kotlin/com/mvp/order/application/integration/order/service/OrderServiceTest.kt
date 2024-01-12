@@ -178,7 +178,7 @@ class OrderServiceTest{
     fun `deleteOrderProductById successfully deletes specified products`() {
         val productIds = mutableListOf(1L)
 
-        orderService.deleteOrderProductById(ProductRemoveOrderDTO("99999999999", productIds))
+        orderService.deleteOrderProductById(ProductRemoveOrderDTO(1, productIds))
 
         productIds.forEach { id ->
             assertFalse(orderProductRepository.existsById(id))

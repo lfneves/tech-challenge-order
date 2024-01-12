@@ -88,6 +88,7 @@ class OrderServiceImpl @Autowired constructor(
                 this.idClient = userDTO.id
             }
             this.externalId = UUID.randomUUID()
+            this.totalPrice = BigDecimal.ZERO
             this.totalPrice = this.totalPrice.add(total)
             this.status = OrderStatusEnum.PENDING.value
         }
@@ -142,7 +143,7 @@ class OrderServiceImpl @Autowired constructor(
     override fun deleteOrderProductById(products: ProductRemoveOrderDTO) {
         try {
             val listProductId = products.orderProductId.toList()
-            orderProductRepository.deleteAllById(listProductId)
+            orderProductRepository.deleteAllProductsByIdOrder(products.idOrder, listProductId)
         } catch (e: Throwable) {
             logger.error(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND, e.printStackTrace())
             throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND)

@@ -11,8 +11,11 @@ import java.math.BigDecimal
 data class ProductEntity(
     @Id
     var id: Long? = null,
+    @Column(name = "name")
     var name: String = "",
+    @Column(name = "price")
     var price: BigDecimal = BigDecimal.ZERO,
+    @Column(name = "quantity")
     var quantity: Int = 0,
 
     @Column(name = "id_category")

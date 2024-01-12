@@ -5,6 +5,7 @@ import com.mvp.order.domain.model.product.ProductDTO
 import com.mvp.order.infrastruture.repository.product.CategoryRepository
 import com.mvp.order.infrastruture.repository.product.ProductRepository
 import com.mvp.order.utils.constants.ErrorMsgConstants
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -52,15 +53,23 @@ class ProductServiceImpl(
     }
 
     override fun getByIdTotalPrice(ids: List<Long?>): BigDecimal {
-        return productRepository.findByIdTotalPrice(ids).price
+        return try {
+            productRepository.findByIdTotalPrice(ids)
+        } catch (e: EmptyResultDataAccessException) {
+            BigDecimal.ZERO
+        }
     }
 
     override fun getProductsByCategoryByName(name: String): List<ProductDTO> {
-        val category = categoryRepository.findByName(name)
-
-        val products = productRepository.findByIdCategory(category.id)
-        return products.map { product ->
-            product.toDTO(category.toDTO())
+        return try {
+            val category = categoryRepository.findByName(name)
+            val products = productRepository.findByIdCategory(category.id)
+            products.map { product ->
+                product.toDTO(category.toDTO())
+            }
+        } catch (e: EmptyResultDataAccessException) {
+            listOf()
         }
+
     }
 }

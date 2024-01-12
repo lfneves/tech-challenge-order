@@ -15,4 +15,11 @@ interface OrderProductRepository : JpaRepository<OrderProductEntity, Long> {
         DELETE FROM tb_order_product WHERE id_order = :id
     """, nativeQuery = true)
     fun deleteByIdOrder(id: Long): Int
+
+    @Modifying
+    @Transactional
+    @Query("""
+        DELETE FROM tb_order_product WHERE id_order = :idOrder AND id_product IN(:productList)
+    """, nativeQuery = true)
+    fun deleteAllProductsByIdOrder(idOrder: Long, productList: List<Long>): Int
 }

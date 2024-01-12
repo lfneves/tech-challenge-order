@@ -9,8 +9,7 @@ Feature: Order BDD test
 
 #Feature: Get order by ID
   Scenario: Getting an existing order by ID
-    Given an order exists with ID 1
-    When I retrieve the order with ID 1
+    When I retrieve the order id with username "99999999999"
     Then the order should be successfully returned
 
   Scenario: Trying to get an order with a non-existing ID
@@ -71,10 +70,13 @@ Feature: Order BDD test
 
 
 #Feature: Delete order products by IDs
-#  Scenario: Deleting existing order products
-#    When I create an order for "99999999998" with products "1, 2, 3"
-#    When I delete the order for "99999999998" products with IDs "1, 2, 3"
-#    Then the order products should be successfully deleted
+  Scenario: Deleting existing order products
+    Given Delete the order by username "99999999999"
+    Given a user named "99999999999"
+    And products with IDs "1, 2, 3"
+    When I create an order for "99999999999" with products "1, 2, 3"
+    When I delete the order by username "99999999999" products with IDs "1, 2"
+    Then the order products should be successfully deleted by username "99999999999" and with remaining one product
 
 #Feature: Delete order by ID
   Scenario: Deleting an existing order

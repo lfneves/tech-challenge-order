@@ -104,7 +104,7 @@ class ProductUnitTest {
         val ids = listOf(1L)
         val expectedPrice = productEntity.price
 
-        every { productRepository.findByIdTotalPrice(ids) } returns productEntity
+        every { productRepository.findByIdTotalPrice(ids) } returns productEntity.price
 
         val result = productService.getByIdTotalPrice(ids)
 

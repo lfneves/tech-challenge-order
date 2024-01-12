@@ -1,6 +1,6 @@
 package com.mvp.order.domain.model.product
 
 data class ProductRemoveOrderDTO(
-    var username: String,
+    var idOrder: Long,
     var orderProductId: MutableList<Long> = mutableListOf()
 )
