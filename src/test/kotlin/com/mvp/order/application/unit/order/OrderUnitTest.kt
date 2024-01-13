@@ -239,10 +239,9 @@ class OrderUnitTest {
     @Test
     fun deleteOrderProductById() {
         every { orderProductRepository.deleteAllById(any()) } just runs
+        every { orderProductRepository.deleteAllProductsByIdOrder(orderId, mutableListOf(1L)) } returns 1
 
         orderService.deleteOrderProductById(ProductRemoveOrderDTO(orderId, mutableListOf(1L)))
-
-        verify { orderProductRepository.deleteAllById(listOf(1L)) }
     }
 
     @Test

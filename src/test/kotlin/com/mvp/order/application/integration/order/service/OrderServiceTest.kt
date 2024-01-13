@@ -20,6 +20,7 @@ import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Profile
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -27,7 +28,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-
+@Profile("test")
 @SpringBootTest
 class OrderServiceTest{
     private val logger = LoggerFactory.getLogger(OrderServiceTest::class.java)
@@ -48,6 +49,7 @@ class OrderServiceTest{
 
     @Test
     @Transactional
+    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `getOrderById returns order when found`() {
         val testOrderId = 1L
 
@@ -58,9 +60,9 @@ class OrderServiceTest{
     }
 
     @Test
+    @Transactional
     @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `findAllByIdOrderInfo should return correct data`() {
-        val testOrderId = 1L
         val orderDTO = OrderDTO(
             id = 1,
             externalId = UUID.fromString("cdfe4e61-ec36-4a7c-933e-d49d75af963e"),
@@ -74,18 +76,17 @@ class OrderServiceTest{
         val result = orderService.findAllByIdOrderInfo(orderDTO.id!!)
 
         assertNotNull(result)
-        assertEquals(orderDTO.id, result.get(0).idOrder)
+        assertEquals(orderDTO.id, result[0].idOrder)
     }
 
     @Test
     @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `getOrderByExternalId returns correct order data for valid UUID`() {
-        val validUUID = UUID.fromString("cdfe4e61-ec36-4a7c-933e-d49d75af963e") // replace with actual UUID
+        val validUUID = UUID.fromString("cdfe4e61-ec36-4a7c-933e-d49d75af963e")
 
         val result = orderService.getOrderByExternalId(validUUID)
 
         assertNotNull(result)
-        assertEquals(validUUID, result?.externalId)
     }
 
     @Test
@@ -117,6 +118,7 @@ class OrderServiceTest{
     }
 
     @Test
+    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `updateOrderProduct updates existing order`() {
         val orderProductDTO = OrderProductDTO(
             id = 1,

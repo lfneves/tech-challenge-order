@@ -16,15 +16,4 @@ data class OrderByIdResponseDTO(
     var waitingTime: LocalDateTime = ZonedDateTime.now(ZoneId.of( "America/Sao_Paulo")).toLocalDateTime(),
     var isFinished: Boolean = false,
     var products: MutableList<OrderProductResponseDTO> = mutableListOf()
-) {
-    fun toEntity(): OrderEntity {
-        return OrderEntity(
-            id = this.id,
-            idClient = this.idClient,
-            totalPrice = this.totalPrice,
-            status = this.status,
-            waitingTime = this.waitingTime,
-            isFinished = this.isFinished
-        )
-    }
-}
+)

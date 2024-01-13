@@ -1,3 +1,7 @@
+delete from public.tb_order_product;
+
+delete from public.tb_order;
+
 insert into public.tb_order (
     id,
     external_id,
@@ -21,5 +25,4 @@ insert into public.tb_order_product (
     id_product)
 values (
     1,
-    1)
-;
+    1);

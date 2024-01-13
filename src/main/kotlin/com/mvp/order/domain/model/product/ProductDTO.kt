@@ -1,6 +1,5 @@
 package com.mvp.order.domain.model.product
 
-import com.mvp.order.infrastruture.entity.product.ProductEntity
 import java.math.BigDecimal
 
 data class ProductDTO(
@@ -11,14 +10,4 @@ data class ProductDTO(
     var idCategory: Long = 0,
 
     var category: CategoryDTO = CategoryDTO()
-) {
-    fun toEntity(): ProductEntity{
-        return ProductEntity(
-            id = this.id,
-            name = this.name,
-            price = this.price,
-            quantity = this.quantity,
-            idCategory = this.idCategory
-        )
-    }
-}
+)

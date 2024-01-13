@@ -32,18 +32,6 @@ data class UserEntity (
         )
     }
 
-    fun toDTO(userEntity: UserEntity, address: AddressEntity? = null): UserDTO {
-        return UserDTO(
-            id = this.id,
-            name = this.name,
-            email = this.email,
-            cpf = this.cpf,
-            idAddress = this.idAddress,
-            password = this.password,
-            address = address
-        )
-    }
-
     fun toDTO(address: AddressEntity? = null): UserDTO {
         return UserDTO(
             id = this.id,

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.api.tasks.testing.Test
 
 plugins {
 	id("org.springframework.boot") version "3.2.1"
@@ -6,6 +7,7 @@ plugins {
 	kotlin("jvm") version "1.9.21"
 	kotlin("plugin.spring") version "1.9.21"
 	kotlin("plugin.jpa") version "1.9.21"
+	jacoco
 }
 
 group = "com.mvp.order"
@@ -52,6 +54,10 @@ dependencies {
 	testImplementation("com.h2database:h2:2.2.224")
 	testImplementation("io.rest-assured:rest-assured:5.4.0")
 	implementation("io.rest-assured:json-schema-validator:5.4.0")
+	testImplementation("io.rest-assured:json-path:5.4.0")
+	testImplementation("io.rest-assured:xml-path:5.4.0")
+	testImplementation("io.rest-assured:spring-mock-mvc:5.4.0")
+
 
 	//Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
@@ -65,6 +71,8 @@ dependencies {
 	implementation("io.cucumber:cucumber-spring:7.15.0")
 	implementation("io.cucumber:cucumber-java:7.15.0")
 	implementation("io.cucumber:cucumber-junit:7.15.0")
+
+	testImplementation("org.jacoco:org.jacoco.core:0.8.11")
 }
 
 tasks.withType<KotlinCompile> {
@@ -76,6 +84,57 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	enabled = true
-	useJUnitPlatform(
-	)
+//	include("com/mvp/order/application/unit/**")
+	useJUnitPlatform()
+	systemProperty("cucumber.junit-platform.naming-strategy", "long")
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.register<Test>("cucumber") {
+	useJUnitPlatform {
+		includeEngines("cucumber")
+	}
+	reports {
+		html.required.set(true)
+		junitXml.required.set(true)
+	}
+	testClassesDirs = sourceSets["test"].output.classesDirs
+	classpath = sourceSets["test"].runtimeClasspath
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+	additionalSourceDirs.setFrom(files(sourceSets.main.get().allSource.srcDirs))
+	classDirectories.setFrom(files(sourceSets.main.get().output))
+}
+
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = BigDecimal.valueOf(0.8)  // 80% coverage
+			}
+		}
+		rule {
+			isEnabled = true
+			element = "CLASS"
+			includes = listOf("org.gradle.*")
+
+			limit {
+				counter = "LINE"
+				value = "TOTALCOUNT"
+				maximum = "0.1".toBigDecimal()
+			}
+		}
+	}
 }

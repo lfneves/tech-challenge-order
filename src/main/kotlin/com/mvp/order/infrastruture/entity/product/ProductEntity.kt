@@ -41,28 +41,4 @@ data class ProductEntity(
             category = category!!
         )
     }
-
-    fun updateUserEntity(productEntity: ProductEntity, request: ProductEntity) {
-        request.id?.let { productEntity.id = it }
-        request.name.let { productEntity.name = it }
-        request.price.let { productEntity.price = it }
-        request.quantity.let { productEntity.quantity = it }
-        request.idCategory?.let { productEntity.idCategory = it }
-    }
-
-    fun toListDTO(listEntity: List<ProductEntity>): List<ProductDTO> {
-        var listDTO: MutableList<ProductDTO> = mutableListOf()
-        listEntity.forEach {
-            listDTO.add(
-                ProductDTO(
-                    id = it.id,
-                    name = it.name,
-                    price = it.price,
-                    quantity = it.quantity,
-                    idCategory = it.idCategory!!
-                )
-            )
-        }
-        return listDTO.toList()
-    }
 }

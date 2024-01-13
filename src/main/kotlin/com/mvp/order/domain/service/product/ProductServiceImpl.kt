@@ -35,12 +35,12 @@ class ProductServiceImpl(
         }
     }
 
-    override fun getAllById(ids: List<Long>): List<ProductDTO> {
-        if (ids.isEmpty()) {
+    override fun getAllById(id: List<Long>): List<ProductDTO> {
+        if (id.isEmpty()) {
             throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_PRODUCT_NOT_FOUND)
         }
 
-        val products = productRepository.findAllProductById(ids)
+        val products = productRepository.findAllProductById(id)
         if (products.isEmpty()) {
             throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_PRODUCT_NOT_FOUND)
         }

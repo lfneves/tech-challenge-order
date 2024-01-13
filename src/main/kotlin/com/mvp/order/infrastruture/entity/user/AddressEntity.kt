@@ -18,11 +18,4 @@ data class AddressEntity (
 
     @Column(name = "postal_code")
     var postalCode: String? =null
-) {
-    fun updateUserEntity(address: AddressEntity, request: AddressEntity) {
-        request.id?.let { address.id = it }
-        request.street?.let { address.street = it }
-        request.city?.let { address.city = it }
-        request.state?.let { address.state = it }
-    }
-}
+)
