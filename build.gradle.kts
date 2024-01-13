@@ -24,17 +24,18 @@ configurations.all {
 
 dependencies {
 
-	//Spring
+	// Spring
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-//	implementation("org.springframework.boot:spring-boot-starter-security")
+	//implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-	// PostgresSQL
+	// Database
 	runtimeOnly("org.postgresql:postgresql")
+	runtimeOnly("com.h2database:h2")
 
-	// Kotlin utils
+	//Kotlin utils
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0")
 
 	//SQS and SNS

@@ -12,8 +12,12 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.context.annotation.Profile
 import java.util.*
 
+@Profile("test")
+@DataJpaTest
 class OrderStep {
 
     @Autowired

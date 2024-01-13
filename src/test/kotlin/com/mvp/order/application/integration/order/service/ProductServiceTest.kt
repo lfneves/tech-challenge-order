@@ -56,7 +56,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @Sql(scripts = ["/product_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/product_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `getAllById returns products for valid IDs`() {
         val validIds = listOf(1L)
 
@@ -68,7 +68,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @Sql(scripts = ["/category.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/category.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `test getProductsByCategoryByName with valid category name`() {
         val result = productService.getProductsByCategoryByName("Bebidas")
 

@@ -58,7 +58,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `findAllByIdOrderInfo should return correct data`() {
         val testOrderId = 1L
         val orderDTO = OrderDTO(
@@ -78,7 +78,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `getOrderByExternalId returns correct order data for valid UUID`() {
         val validUUID = UUID.fromString("cdfe4e61-ec36-4a7c-933e-d49d75af963e") // replace with actual UUID
 
@@ -131,7 +131,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `saveAllOrderProduct saves and returns list of order products`() {
         val testData = listOf(OrderProductEntity(id = 1L, idProduct = 1L, idOrder = 9999L))
 
@@ -144,7 +144,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `getAllOrderProductsByIdOrder returns products for existing order`() {
         val existingOrderId = 9999L
 
@@ -164,7 +164,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `deleteOrderById successfully deletes an order`() {
         val orderId = 1L
 
@@ -174,7 +174,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `deleteOrderProductById successfully deletes specified products`() {
         val productIds = mutableListOf(1L)
 
