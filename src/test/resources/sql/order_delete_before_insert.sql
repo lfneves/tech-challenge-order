@@ -18,7 +18,7 @@ values (
     'Pendente',
     19.99,
     now())
-;
+ON CONFLICT DO NOTHING;
 
 insert into public.tb_order_product (
     id_order,
@@ -26,4 +26,4 @@ insert into public.tb_order_product (
 values (
     9999,
     1)
-;
+ON CONFLICT DO NOTHING;

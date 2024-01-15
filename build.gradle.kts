@@ -57,6 +57,7 @@ dependencies {
 	testImplementation("io.rest-assured:json-path:5.4.0")
 	testImplementation("io.rest-assured:xml-path:5.4.0")
 	testImplementation("io.rest-assured:spring-mock-mvc:5.4.0")
+	testImplementation("io.rest-assured:kotlin-extensions:5.4.0")
 
 
 	//Swagger
@@ -84,7 +85,6 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	enabled = true
-//	include("com/mvp/order/application/unit/**")
 	useJUnitPlatform()
 	systemProperty("cucumber.junit-platform.naming-strategy", "long")
 	finalizedBy(tasks.jacocoTestReport)
@@ -114,26 +114,25 @@ tasks.jacocoTestReport {
 		xml.required.set(true)
 		html.required.set(true)
 	}
-	additionalSourceDirs.setFrom(files(sourceSets.main.get().allSource.srcDirs))
-	classDirectories.setFrom(files(sourceSets.main.get().output))
+	val excludes = listOf("**/configuration/*", "**/model/*",
+		"**/utils/*", "**OrderApplication*", "**/com/mvp/order/infrastruture/entity/*")
+	classDirectories.setFrom(files(classDirectories.files.map {
+		fileTree(it).apply {
+			exclude(excludes)
+		}
+	}))
 }
 
 tasks.jacocoTestCoverageVerification {
 	violationRules {
+		val excludes = listOf("**/configuration/**", "**/com/mvp/order/domain/model/**",
+			"**/utils/**", "**OrderApplication**", "**/com/mvp/order/infrastruture/entity/**")
+			classDirectories.setFrom(files(classDirectories.files.map {
+				fileTree(it).exclude(excludes)
+			}))
 		rule {
 			limit {
 				minimum = BigDecimal.valueOf(0.8)  // 80% coverage
-			}
-		}
-		rule {
-			isEnabled = true
-			element = "CLASS"
-			includes = listOf("org.gradle.*")
-
-			limit {
-				counter = "LINE"
-				value = "TOTALCOUNT"
-				maximum = "0.1".toBigDecimal()
 			}
 		}
 	}

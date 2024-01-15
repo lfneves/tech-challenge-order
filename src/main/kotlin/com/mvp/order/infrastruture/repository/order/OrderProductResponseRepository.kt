@@ -16,8 +16,8 @@ interface OrderProductResponseRepository : JpaRepository<OrderProductResponseEnt
                tb_product.price
         FROM tb_order_product
         INNER JOIN tb_order ON tb_order.id = tb_order_product.id_order
-        INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
-        INNER JOIN tb_category ON tb_category.id = tb_product.id_category
+        LEFT JOIN tb_product ON tb_product.id = tb_order_product.id_product
+        LEFT JOIN tb_category ON tb_category.id = tb_product.id_category
         WHERE tb_order_product.id_order = :id
     """, nativeQuery = true)
     fun findAllByIdOrderInfo(@Param("id") id: Long): List<OrderProductResponseEntity>

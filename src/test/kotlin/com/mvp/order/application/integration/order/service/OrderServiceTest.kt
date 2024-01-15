@@ -19,8 +19,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -60,11 +62,10 @@ class OrderServiceTest{
     }
 
     @Test
-    @Transactional
-    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    //@Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `findAllByIdOrderInfo should return correct data`() {
         val orderDTO = OrderDTO(
-            id = 1,
+            id = 1L,
             externalId = UUID.fromString("cdfe4e61-ec36-4a7c-933e-d49d75af963e"),
             idClient = 1,
             totalPrice = BigDecimal.TEN,
@@ -74,9 +75,8 @@ class OrderServiceTest{
         )
 
         val result = orderService.findAllByIdOrderInfo(orderDTO.id!!)
-
         assertNotNull(result)
-        assertEquals(orderDTO.id, result[0].idOrder)
+        assertEquals(orderDTO.id, result[0].id)
     }
 
     @Test

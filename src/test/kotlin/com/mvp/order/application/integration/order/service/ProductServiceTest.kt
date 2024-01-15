@@ -70,7 +70,6 @@ class ProductServiceTest {
     }
 
     @Test
-    @Sql(scripts = ["/sql/category.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `test getProductsByCategoryByName with valid category name`() {
         val result = productService.getProductsByCategoryByName("Bebidas")
 
