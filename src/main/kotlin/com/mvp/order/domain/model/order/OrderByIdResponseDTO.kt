@@ -1,6 +1,5 @@
 package com.mvp.order.domain.model.order
 
-import com.mvp.order.infrastruture.entity.order.OrderEntity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneId
