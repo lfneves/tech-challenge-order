@@ -23,8 +23,7 @@ spec:
 #                    do echo waiting for database; sleep 2; done;' ]
       containers:
         - name:  order-ws
-#          image:  lfneves/delivery-mvp:1.0.1
-          image: 566907801160.dkr.ecr.us-east-1.amazonaws.com/order-ws:latest
+          image: ${ORDER_WS_IMAGE}
           ports:
             - containerPort: 8099
           env:

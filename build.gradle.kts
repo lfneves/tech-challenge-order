@@ -115,7 +115,7 @@ tasks.jacocoTestReport {
 		html.required.set(true)
 	}
 	val excludes = listOf("**/configuration/*", "**/model/*",
-		"**/utils/*", "**OrderApplication*", "**/com/mvp/order/infrastruture/entity/*")
+		"**/utils/*", "**/com/mvp/order/OrderApplication.class", "**/com/mvp/order/infrastruture/entity/*")
 	classDirectories.setFrom(files(classDirectories.files.map {
 		fileTree(it).apply {
 			exclude(excludes)
@@ -126,7 +126,7 @@ tasks.jacocoTestReport {
 tasks.jacocoTestCoverageVerification {
 	violationRules {
 		val excludes = listOf("**/configuration/**", "**/com/mvp/order/domain/model/**",
-			"**/utils/**", "**OrderApplication**", "**/com/mvp/order/infrastruture/entity/**")
+			"**/utils/**", "**/com/mvp/order/OrderApplication.class", "**/com/mvp/order/infrastruture/entity/**")
 			classDirectories.setFrom(files(classDirectories.files.map {
 				fileTree(it).exclude(excludes)
 			}))

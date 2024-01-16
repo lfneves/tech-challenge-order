@@ -28,15 +28,4 @@ spring:
       file: "docker-compose.yml"
 
 order:
-  mp-api:
-    token: "${TOKEN_API:Bearer TEST-29597298295284-083000-fcac7f6198671d6a6b16cdeecc34c787-170225675}"
-    userId: "${USER_ID:170225675}"
-    sponsorId: "S{SPONSOR_ID:57174696}"
-    url: "https://api.mercadopago.com/"
-#    notificationUrl: "${NOTIFICATION_URL:https://webhook.site/3a01d6b2-7c0c-4c45-a5c7-5b305a11a3a8}"
-    notificationUrl: "${NOTIFICATION_URL:https://hkdk.events/lfMwUjaPsk5y}"
-  api-endpoints:
-    qrs: "instore/orders/qr/seller/collectors/?/pos/?/qrs"
-  sns:
-#    topicArn: "${TOPIC_ORDER_SNS:arn:aws:sns:us-east-1:566907801160:ORDER_TOPIC}"
     topicArn: "${TOPIC_ORDER_SNS:localhost:4566:ORDER_TOPIC}"
