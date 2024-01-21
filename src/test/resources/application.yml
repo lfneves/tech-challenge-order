@@ -28,3 +28,7 @@ logging:
     root:
       org.springframework.web: "debug"
       org.hibernate: "debug"
+
+order:
+  sns:
+    topicArn: "${TOPIC_ORDER_SNS}"

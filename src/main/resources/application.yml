@@ -28,4 +28,5 @@ spring:
       file: "docker-compose.yml"
 
 order:
-    topicArn: "${TOPIC_ORDER_SNS:localhost:4566:ORDER_TOPIC}"
+  sns:
+    topicArn: "${TOPIC_ORDER_SNS}"
