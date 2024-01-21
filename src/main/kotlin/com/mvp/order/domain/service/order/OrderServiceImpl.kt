@@ -1,6 +1,7 @@
 package com.mvp.order.domain.service.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.*
@@ -33,7 +34,7 @@ class OrderServiceImpl @Autowired constructor(
 ): OrderService {
     var logger: Logger = LoggerFactory.getLogger(OrderServiceImpl::class.java)
 
-    private val mapper = ObjectMapper().registerModule(JavaTimeModule())
+    private val mapper = ObjectMapper().registerModule(JavaTimeModule()).enable(SerializationFeature.INDENT_OUTPUT)
 
     override fun getOrderById(id: Long): OrderByIdResponseDTO {
         val orderEntity = orderRepository.findByIdOrder(id)
@@ -64,8 +65,16 @@ class OrderServiceImpl @Autowired constructor(
         }
     }
 
-    override fun getOrderByExternalId(externalId: UUID): OrderByIdResponseDTO? {
-        return orderRepository.findByExternalId(externalId.toString())?.toResponseDTO()
+    override fun getOrderByExternalId(externalId: String): OrderByIdResponseDTO {
+        val orderEntity = orderRepository.findByExternalId(externalId)
+        return if(orderEntity.isPresent) {
+            val orderResponseDTO = orderEntity.get().toResponseDTO()
+            val orderProducts = findAllByIdOrderInfo(orderResponseDTO.id!!)
+            orderResponseDTO.products.addAll(orderProducts)
+            orderResponseDTO
+        } else {
+            throw Exceptions.RequestedElementNotFoundException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
+        }
     }
 
     override fun createOrder(orderRequestDTO: OrderRequestDTO): OrderResponseDTO {
@@ -87,7 +96,7 @@ class OrderServiceImpl @Autowired constructor(
             if (userDTO != null) {
                 this.idClient = userDTO.id
             }
-            this.externalId = UUID.randomUUID()
+            this.externalId = existingOrder.externalId
             this.totalPrice = BigDecimal.ZERO
             this.totalPrice = this.totalPrice.add(total)
             this.status = OrderStatusEnum.PENDING.value
@@ -97,7 +106,7 @@ class OrderServiceImpl @Autowired constructor(
         orderRequestDTO.orderProduct.forEach { it.idOrder = savedOrder.id }
         savedOrder.productList = orderProductRepository.saveAll(orderRequestDTO.toEntityList()).toMutableList()
 
-//        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
+        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
         return OrderResponseDTO(savedOrder)
     }
 

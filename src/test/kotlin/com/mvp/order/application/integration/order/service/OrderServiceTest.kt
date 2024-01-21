@@ -19,10 +19,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -84,7 +82,7 @@ class OrderServiceTest{
     fun `getOrderByExternalId returns correct order data for valid UUID`() {
         val validUUID = UUID.fromString("cdfe4e61-ec36-4a7c-933e-d49d75af963e")
 
-        val result = orderService.getOrderByExternalId(validUUID)
+        val result = orderService.getOrderByExternalId(validUUID.toString())
 
         assertNotNull(result)
     }

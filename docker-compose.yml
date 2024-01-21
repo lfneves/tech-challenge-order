@@ -10,6 +10,12 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    env_file:
+      - ./docker_compose.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgresdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
     networks:
       - mvp-network
 

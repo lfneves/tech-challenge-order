@@ -125,12 +125,12 @@ class OrderStep {
     // Retrieve order by external ID
     @When("I retrieve the order with external ID")
     fun anOrderExistsWithExternalId() {
-        retrievedOrder = orderService.getOrderByExternalId(result.orderDTO?.externalId!!)
+        retrievedOrder = orderService.getOrderByExternalId(result.orderDTO?.externalId.toString())
     }
 
     @When("I retrieve not exist the order with external ID {string}")
     fun iRetrieveNotExistTheOrderWithExternalId(externalId: String) {
-        retrievedOrder = orderService.getOrderByExternalId(UUID.fromString(externalId))
+        retrievedOrder = orderService.getOrderByExternalId(externalId)
     }
 
     @Then("no order should be found")

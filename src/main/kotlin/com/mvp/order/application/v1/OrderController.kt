@@ -35,6 +35,17 @@ class OrderController @Autowired constructor(private val orderService: OrderServ
         )
     }
 
+    @GetMapping("external-id/{id}")
+    @Operation(
+        summary = "Busca pedido pelo external id",
+        description = "Busca pedido por external id",
+        tags = ["Pedidos"]
+    )
+    fun getOrderByExternalId(@PathVariable externalId: String): ResponseEntity<OrderByIdResponseDTO> {
+        return ResponseEntity.ok(orderService.getOrderByExternalId(externalId)
+        )
+    }
+
     @GetMapping("all-products-by-order-id/{id}")
     @Operation(
         summary = "Busca todos os produtos id do pedido",

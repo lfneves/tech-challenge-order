@@ -3,7 +3,6 @@ package com.mvp.order.domain.service.order
 import com.mvp.order.domain.model.order.*
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.infrastruture.entity.order.OrderProductEntity
-import java.util.*
 
 interface OrderService {
 
@@ -11,7 +10,7 @@ interface OrderService {
 
     fun findAllByIdOrderInfo(id: Long): List<OrderProductResponseDTO>
 
-    fun getOrderByExternalId(externalId: UUID): OrderByIdResponseDTO?
+    fun getOrderByExternalId(externalId: String): OrderByIdResponseDTO?
 
     fun createOrder(orderRequestDTO: OrderRequestDTO): OrderResponseDTO
 
