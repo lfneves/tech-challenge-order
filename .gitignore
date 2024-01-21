@@ -99,3 +99,4 @@ kotlin-ide/
 .env
 *.env
 docker_compose.env
+dev-env.sh
