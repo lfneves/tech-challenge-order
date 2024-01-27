@@ -8,6 +8,15 @@ plugins {
 	kotlin("plugin.spring") version "1.9.21"
 	kotlin("plugin.jpa") version "1.9.21"
 	jacoco
+	id("org.sonarqube") version "4.4.1.3373"
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "lfneves_tech-challenge-order")
+		property("sonar.organization", "lfneves")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
 }
 
 group = "com.mvp.order"
