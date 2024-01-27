@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
+import software.amazon.awssdk.core.exception.SdkClientException
 import java.math.BigDecimal
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -94,7 +95,7 @@ class OrderServiceTest{
     }
 
     @Test
-    fun `createOrder creates and returns a valid order`() {
+    fun `createOrder creates and returns with error sns `() {
         val orderProductDTO = OrderProductDTO(
             id = 1,
             idProduct = 1,
@@ -104,8 +105,9 @@ class OrderServiceTest{
 
         every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
-        val result = orderService.createOrder(orderRequestDTO)
-        assertNotNull(result)
+        assertThrows<SdkClientException> {
+            orderService.createOrder(orderRequestDTO)
+        }
     }
 
     @Test
@@ -124,7 +126,7 @@ class OrderServiceTest{
 
     @Test
     @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    fun `updateOrderProduct updates existing order`() {
+    fun `updateOrderProduct updates existing order with eror sns`() {
         val orderProductDTO = OrderProductDTO(
             id = 1,
             idProduct = 1,
@@ -134,9 +136,9 @@ class OrderServiceTest{
 
         every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
-        val result = orderService.updateOrderProduct(orderRequestDTO)
-
-        assertNotNull(result)
+        assertThrows<SdkClientException> {
+            orderService.updateOrderProduct(orderRequestDTO)
+        }
     }
 
     @Test

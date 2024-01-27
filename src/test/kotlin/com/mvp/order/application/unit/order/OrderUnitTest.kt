@@ -177,7 +177,6 @@ class OrderUnitTest {
 
     @Test
     fun getOrderByExternalId() {
-        val expectedOrder = orderByIdResponseDTO
         var orderEntityOptional = Optional.of(orderEntity)
         every { orderRepository.findByExternalId(orderEntity.externalId.toString()) } returns orderEntityOptional
         every { orderProductResponseRepository.findAllByIdOrderInfo(orderId) } returns listOf(orderProductResponseEntity)

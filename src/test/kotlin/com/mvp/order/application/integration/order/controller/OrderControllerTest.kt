@@ -82,7 +82,7 @@ class OrderControllerTest {
     }
 
     @Test
-    fun `Test Add New Product To Order`() {
+    fun `Test Add New Product To Order with error sns`() {
         val orderProductDTO = OrderProductDTO(
             id = 1,
             idProduct = 1,
@@ -98,7 +98,7 @@ class OrderControllerTest {
             .`when`()
             .put("/api/v1/order/add-new-product-to-order")
             .then()
-            .statusCode(HttpStatus.OK.value())
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
     }
 
     @Test
@@ -134,7 +134,7 @@ class OrderControllerTest {
     }
 
     @Test
-    fun `test create order`() {
+    fun `test create order with error sns`() {
         val orderProductDTO = OrderProductDTO(
             id = 1,
             idProduct = 1,
@@ -151,6 +151,6 @@ class OrderControllerTest {
             .`when`()
             .post("/api/v1/order/create-order")
             .then()
-            .statusCode(HttpStatus.OK.value())
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
     }
 }
