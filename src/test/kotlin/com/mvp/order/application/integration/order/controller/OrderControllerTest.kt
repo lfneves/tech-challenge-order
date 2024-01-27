@@ -91,6 +91,7 @@ class OrderControllerTest {
     }
 
     @Test
+    @Sql(scripts = ["/sql/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `Test Add New Product To Order with error sns`() {
         val orderProductDTO = OrderProductDTO(
             id = 1,
