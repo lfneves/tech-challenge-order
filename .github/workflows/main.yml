@@ -20,6 +20,7 @@ env:
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
   KUBE_NAMESPACE: delivery-cluster
   RELEASE_REVISION: "pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}"
+  TOPIC_ORDER_SNS: ${{ secrets.TOPIC_ORDER_SNS }}
 
 jobs:
   build:
@@ -62,6 +63,8 @@ jobs:
         java-version: 17
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      env:
+        TOPIC_ORDER_SNS: ${{ secrets.TOPIC_ORDER_SNS }}
     - name: Build with Gradle
       run: ./gradlew build
     - name: Run tests
