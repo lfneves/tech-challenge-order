@@ -56,7 +56,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      TOPIC_ORDER_SNS: ${{secret.TOPIC_ORDER_SNS}}
+      TOPIC_ORDER_SNS: ${{secrets.TOPIC_ORDER_SNS}}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
