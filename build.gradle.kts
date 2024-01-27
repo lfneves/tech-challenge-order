@@ -17,11 +17,11 @@ sonar {
 		property("sonar.organization", "lfneves")
 		property("sonar.host.url", "https://sonarcloud.io")
 		property("sonar.exclusions", "**/configuration/*")
-		property("sonar.exclusions", "**/model/**")
-		property("sonar.exclusions", "**/utils/**")
+		property("sonar.exclusions", "**/model/*")
+		property("sonar.exclusions", "**/utils/*")
 		property("sonar.exclusions", "**/com/mvp/order/OrderApplication.kt")
-		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/**")
-		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/**")
+		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/*")
+		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/*")
 	}
 }
 
