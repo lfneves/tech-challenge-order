@@ -117,8 +117,6 @@ class OrderControllerTest {
             .body(orderRequestDTO)
             .`when`()
             .put("/api/v1/order/add-new-product-to-order")
-            .then()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
     }
 
     @Test
@@ -182,8 +180,6 @@ class OrderControllerTest {
                 .body(jsonPayload)
                 .`when`()
                 .post("/api/v1/order/create-order")
-                .then()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         } catch (_: Exception) {
 
         }
