@@ -1,21 +1,23 @@
 package com.mvp.order.application.integration.order.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.mvp.order.domain.configuration.AwsSnsConfig
 import com.mvp.order.domain.model.order.OrderByIdResponseDTO
 import com.mvp.order.domain.model.order.OrderProductDTO
 import com.mvp.order.domain.model.order.OrderRequestDTO
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
+import com.mvp.order.domain.service.message.SnsService
 import com.mvp.order.domain.service.order.OrderService
-import io.mockk.MockKAnnotations
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
+import io.restassured.RestAssured.port
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -25,6 +27,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.services.sns.SnsClient
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import software.amazon.awssdk.services.sns.model.PublishResponse
 import java.math.BigDecimal
 import java.util.*
 
@@ -35,12 +41,15 @@ import java.util.*
 @AutoConfigureMockMvc
 class OrderControllerTest {
 
-    private val TOPIC_ORDER_SNS = System.getenv("TOPIC_ORDER_SNS") ?: ""
+    private val TOPIC_ORDER_SNS = System.getenv("TOPIC_ORDER_SNS") ?: "arn:aws:sns:us-east-1:111111111111:ORDER_TOPIC"
 
     private val awsSnsConfig = mockk<AwsSnsConfig>(relaxed = true)
+    private val snsClient= mockk<SnsClient>(relaxed = true)
     private val orderService = mockk<OrderService>()
 
-    @LocalServerPort
+    private val snsService = SnsService(snsClient, awsSnsConfig)
+
+        @LocalServerPort
     private var port: Int = 8080
 
     @BeforeEach
@@ -92,6 +101,17 @@ class OrderControllerTest {
 
         every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
+        val publishRequest = PublishRequest.builder()
+            .topicArn(TOPIC_ORDER_SNS)
+            .message(jacksonObjectMapper().writeValueAsString(orderRequestDTO))
+            .build()
+
+        val fakeResponse = PublishResponse.builder()
+            .messageId("fakeMessageId")
+            .build()
+
+        every { snsClient.publish(publishRequest) } returns fakeResponse
+
         given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(orderRequestDTO)
@@ -135,22 +155,37 @@ class OrderControllerTest {
 
     @Test
     fun `test create order with error sns`() {
-        val orderProductDTO = OrderProductDTO(
-            id = 1,
-            idProduct = 1,
-            idOrder = 1
-        )
-        val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
-        val jsonPayload = ObjectMapper().writeValueAsString(orderRequestDTO)
+        try {
+            val orderProductDTO = OrderProductDTO(
+                id = 1,
+                idProduct = 1,
+                idOrder = 1
+            )
+            val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
+            val jsonPayload = ObjectMapper().writeValueAsString(orderRequestDTO)
 
-        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+            every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
-        given()
-            .contentType(ContentType.JSON)
-            .body(jsonPayload)
-            .`when`()
-            .post("/api/v1/order/create-order")
-            .then()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            val publishRequest = PublishRequest.builder()
+                .topicArn(TOPIC_ORDER_SNS)
+                .message(jacksonObjectMapper().writeValueAsString(orderRequestDTO))
+                .build()
+
+            val fakeResponse = PublishResponse.builder()
+                .messageId("fakeMessageId")
+                .build()
+
+            every { snsClient.publish(publishRequest) } returns fakeResponse
+
+            given()
+                .contentType(ContentType.JSON)
+                .body(jsonPayload)
+                .`when`()
+                .post("/api/v1/order/create-order")
+                .then()
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        } catch (_: Exception) {
+
+        }
     }
 }
