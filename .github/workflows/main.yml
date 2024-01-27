@@ -65,12 +65,14 @@ jobs:
         java-version: 17
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
     - name: Run tests
       env:
         TOPIC_ORDER_SNS: ${{env.TOPIC_ORDER_SNS}}
-      run: ./gradlew test
+      run: ./gradlew clean test
+#    - name: Run tests
+#      env:
+#        TOPIC_ORDER_SNS: ${{env.TOPIC_ORDER_SNS}}
+#      run: ./gradlew test
   
   sonarcloud:
     name: Sonar Trigger
