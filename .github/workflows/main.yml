@@ -1,4 +1,4 @@
-name: tech challenge order-ws
+name: Tech challenge order-ws
 
 on:
   workflow_dispatch:
