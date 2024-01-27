@@ -68,7 +68,7 @@ jobs:
     - name: Run tests
       env:
         TOPIC_ORDER_SNS: ${{env.TOPIC_ORDER_SNS}}
-      run: ./gradlew test
+      run: ./gradlew clean test
   
   sonarcloud:
     name: Sonar Trigger
