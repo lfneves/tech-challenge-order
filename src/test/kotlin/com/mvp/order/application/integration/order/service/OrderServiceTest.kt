@@ -95,6 +95,7 @@ class OrderServiceTest{
     }
 
     @Test
+    @Sql(scripts = ["/sql/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `createOrder creates and returns with error sns `() {
         val orderProductDTO = OrderProductDTO(
             id = 1,
