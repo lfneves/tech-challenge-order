@@ -1,4 +1,4 @@
-name: Kotlin Build CI with Gradle
+name: tech challenge order-ws
 
 on:
   workflow_dispatch:
@@ -58,13 +58,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
+      env:
+        TOPIC_ORDER_SNS: ${{ secrets.TOPIC_ORDER_SNS }}
+      run: echo "TOPIC_ORDER_SNS=$TOPIC_ORDER_SNS" >> $GITHUB_ENV
       uses: actions/setup-java@v1
       with:
         java-version: 17
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      env:
-        TOPIC_ORDER_SNS: ${{ secrets.TOPIC_ORDER_SNS }}
     - name: Build with Gradle
       run: ./gradlew build
     - name: Run tests
