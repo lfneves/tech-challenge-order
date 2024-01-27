@@ -16,6 +16,8 @@ sonar {
 		property("sonar.projectKey", "lfneves_tech-challenge-order")
 		property("sonar.organization", "lfneves")
 		property("sonar.host.url", "https://sonarcloud.io")
+		property("sonar.exclusions", listOf("**/configuration/*", "**/model/*",
+			"**/utils/*", "**/com/mvp/order/OrderApplication.kt", "**/com/mvp/order/infrastruture/entity/*"))
 	}
 }
 

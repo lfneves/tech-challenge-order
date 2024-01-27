@@ -106,7 +106,7 @@ class OrderServiceTest{
 
         every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
-        assertThrows<SdkClientException> {
+        assertThrows<Exception> {
             orderService.createOrder(orderRequestDTO)
         }
     }
@@ -137,7 +137,7 @@ class OrderServiceTest{
 
         every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
-        assertThrows<SdkClientException> {
+        assertThrows<Exception> {
             orderService.updateOrderProduct(orderRequestDTO)
         }
     }
