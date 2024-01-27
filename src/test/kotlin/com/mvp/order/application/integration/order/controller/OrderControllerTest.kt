@@ -1,6 +1,7 @@
 package com.mvp.order.application.integration.order.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.mvp.order.domain.configuration.AwsSnsConfig
 import com.mvp.order.domain.model.order.OrderByIdResponseDTO
 import com.mvp.order.domain.model.order.OrderProductDTO
 import com.mvp.order.domain.model.order.OrderRequestDTO
@@ -34,6 +35,9 @@ import java.util.*
 @AutoConfigureMockMvc
 class OrderControllerTest {
 
+    private val TOPIC_ORDER_SNS = System.getenv("TOPIC_ORDER_SNS") ?: ""
+
+    private val awsSnsConfig = mockk<AwsSnsConfig>(relaxed = true)
     private val orderService = mockk<OrderService>()
 
     @LocalServerPort
@@ -85,6 +89,9 @@ class OrderControllerTest {
             idOrder = 1
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
+
+        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+
         given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(orderRequestDTO)
@@ -113,7 +120,9 @@ class OrderControllerTest {
             idOrder = 1L,
             orderProductId = mutableListOf(1L)
         )
-        val jsonPayload = ObjectMapper().writeValueAsString(productRemoveOrderDTO) // Convert DTO to JSON
+        val jsonPayload = ObjectMapper().writeValueAsString(productRemoveOrderDTO)
+
+        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         given()
             .contentType(ContentType.JSON)
@@ -132,8 +141,9 @@ class OrderControllerTest {
             idOrder = 1
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
-
         val jsonPayload = ObjectMapper().writeValueAsString(orderRequestDTO)
+
+        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         given()
             .contentType(ContentType.JSON)

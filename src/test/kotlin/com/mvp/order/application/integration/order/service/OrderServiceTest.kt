@@ -1,5 +1,6 @@
 package com.mvp.order.application.integration.order.service
 
+import com.mvp.order.domain.configuration.AwsSnsConfig
 import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.OrderDTO
 import com.mvp.order.domain.model.order.OrderProductDTO
@@ -13,6 +14,8 @@ import com.mvp.order.infrastruture.entity.order.OrderProductEntity
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
 import com.mvp.order.infrastruture.repository.order.OrderProductResponseRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,6 +36,8 @@ import java.util.*
 class OrderServiceTest{
     private val logger = LoggerFactory.getLogger(OrderServiceTest::class.java)
 
+    private val TOPIC_ORDER_SNS = System.getenv("TOPIC_ORDER_SNS") ?: ""
+
     @Autowired private lateinit var orderService: OrderServiceImpl
     @Autowired private lateinit var orderProductRepository: OrderProductRepository
     @Autowired private lateinit var orderProductResponseRepository: OrderProductResponseRepository
@@ -41,6 +46,7 @@ class OrderServiceTest{
     @Autowired private lateinit var productService: ProductServiceImpl
     @Autowired private lateinit var userService: UserServiceImpl
 
+    private val awsSnsConfig = mockk<AwsSnsConfig>(relaxed = true)
 
     @BeforeEach
     fun init() {
@@ -96,8 +102,9 @@ class OrderServiceTest{
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
 
-        val result = orderService.createOrder(orderRequestDTO)
+        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
+        val result = orderService.createOrder(orderRequestDTO)
         assertNotNull(result)
     }
 
@@ -124,6 +131,8 @@ class OrderServiceTest{
             idOrder = 1
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
+
+        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         val result = orderService.updateOrderProduct(orderRequestDTO)
 
