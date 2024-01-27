@@ -16,9 +16,12 @@ sonar {
 		property("sonar.projectKey", "lfneves_tech-challenge-order")
 		property("sonar.organization", "lfneves")
 		property("sonar.host.url", "https://sonarcloud.io")
-		property("sonar.exclusions", listOf("**/configuration/*", "**/model/*",
-			"**/utils/*", "**/com/mvp/order/OrderApplication.kt", "**/com/mvp/order/infrastruture/entity/*"))
-	}
+		property("sonar.exclusions", "**/configuration/*")
+		property("sonar.exclusions", "**/model/**")
+		property("sonar.exclusions", "**/utils/**")
+		property("sonar.exclusions", "**/com/mvp/order/OrderApplication.kt")
+		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/**")
+		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/**")
 }
 
 group = "com.mvp.order"
