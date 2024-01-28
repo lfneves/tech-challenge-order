@@ -22,6 +22,7 @@ sonar {
 		property("sonar.exclusions", "**/com/mvp/order/OrderApplication.kt")
 		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/*")
 		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/*")
+		property("sonar.coverage.jacoco.xmlReportPaths", "$rootDir/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml")
 	}
 }
 
