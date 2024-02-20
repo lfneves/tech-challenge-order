@@ -10,6 +10,7 @@ import jakarta.persistence.*
 data class UserEntity (
     @Id
     @Schema(hidden = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int? = null,
     var name: String? = null,
     var email: String? = null,

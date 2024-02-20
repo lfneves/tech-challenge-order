@@ -15,4 +15,8 @@ interface UserRepository : JpaRepository<UserEntity, Long> {
         INNER JOIN tb_address ON tb_client.id_address = tb_address.id 
         WHERE tb_client.cpf = :username """, nativeQuery = true)
     fun findByUsernameWithAddress(username: String?): Optional<UserEntity>
+
+    fun findByEmail(email: String?): Optional<UserEntity>
+
+    fun findByCpf(email: String?): Optional<UserEntity>
 }

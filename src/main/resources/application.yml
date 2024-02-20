@@ -13,19 +13,19 @@ spring:
   profiles:
     active: production
   datasource:
-#    url: "${POSTGRES_HOST:jdbc:postgresql://localhost:5432/postgresdb}"
-    host: "${POSTGRES_HOST:localhost}"
-    port: "${POSTGRES_PORT:5432}"
-    database: "${POSTGRES_DB:postgresdb}"
-    user: "${POSTGRES_USER:postgres}"
-    password: "${POSTGRES_PASSWORD:postgres}"
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:postgresdb}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      transaction:
+        jta:
+          platform: none
+      ddl-auto: update
+    show-sql: true
+  jta:
+    enabled: false
   docker:
     compose:
       file: "docker-compose.yml"

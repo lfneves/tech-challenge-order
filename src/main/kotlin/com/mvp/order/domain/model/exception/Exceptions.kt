@@ -17,4 +17,6 @@ object Exceptions {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class BadStatusException(message: String): RuntimeException(message)
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    class DuplicateException(message: String) : RuntimeException(message)
 }
