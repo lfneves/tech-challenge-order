@@ -1,6 +1,7 @@
 package com.mvp.order.domain.model.auth
 
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 @JvmRecord
@@ -9,31 +10,18 @@ data class AuthClientDTO(
     val email: String,
     val password: String
 ): UserDetails {
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        TODO("Not yet implemented")
-    }
 
-    override fun getPassword(): String {
-        return password
-    }
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> =  mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
 
-    override fun getUsername(): String {
-        return name
-    }
+    override fun getPassword(): String = password
 
-    override fun isAccountNonExpired(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun getUsername(): String = email
 
-    override fun isAccountNonLocked(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isAccountNonExpired(): Boolean = true
 
-    override fun isCredentialsNonExpired(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isAccountNonLocked(): Boolean = true
 
-    override fun isEnabled(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun isCredentialsNonExpired(): Boolean = true
+
+    override fun isEnabled(): Boolean = true
 }
