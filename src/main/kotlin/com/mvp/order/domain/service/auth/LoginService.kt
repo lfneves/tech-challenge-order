@@ -14,8 +14,8 @@ class LoginService @Autowired constructor(
 ) {
 
     @Transactional
-    fun addLoginAttempt(email: String, success: Boolean) {
-        val loginAttempt = LoginAttempt(email, success, LocalDateTime.now())
+    fun addLoginAttempt(username: String, success: Boolean) {
+        val loginAttempt = LoginAttempt(username, success, LocalDateTime.now())
         repository.save(loginAttempt.toEntity())
     }
 

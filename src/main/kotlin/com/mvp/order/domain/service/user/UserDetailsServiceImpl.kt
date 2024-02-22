@@ -7,6 +7,7 @@ import com.mvp.order.infrastruture.repository.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 
@@ -15,17 +16,19 @@ class UserDetailsServiceImpl @Autowired constructor(
     private val repository: UserRepository
 ) : UserDetailsService {
 
-    override fun loadUserByUsername(email: String): UserDetails? {
-        val user: UserEntity = repository.findByEmail(email).orElseThrow {
-            Exceptions.NotFoundException(
-                String.format("User does not exist, email: %s", email)
-            )
-        }
-
+    override fun loadUserByUsername(username: String): UserDetails {
+        val userEntity = repository.findByCpf(username)
+            .orElseGet {
+                repository.findByEmail(username).orElseThrow {
+                    UsernameNotFoundException(
+                        "User does not exist with username (CPF or email): $username"
+                    )
+                }
+            }
         return AuthClientDTO(
-            user.name!!,
-            user.email!!,
-            user.password!!
+            userEntity.name ?: throw IllegalStateException("Name is required"),
+            userEntity.email ?: throw IllegalStateException("Email is required"),
+            userEntity.password ?: throw IllegalStateException("Password is required")
         )
     }
 }

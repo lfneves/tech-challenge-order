@@ -96,7 +96,7 @@ class OrderServiceImpl @Autowired constructor(
             if (userDTO != null) {
                 this.idClient = userDTO.id
             }
-            this.externalId = existingOrder.externalId
+            this.externalId = existingOrder.externalId ?: UUID.randomUUID()
             this.totalPrice = BigDecimal.ZERO
             this.totalPrice = this.totalPrice.add(total)
             this.status = OrderStatusEnum.PENDING.value
@@ -106,7 +106,7 @@ class OrderServiceImpl @Autowired constructor(
         orderRequestDTO.orderProduct.forEach { it.idOrder = savedOrder.id }
         savedOrder.productList = orderProductRepository.saveAll(orderRequestDTO.toEntityList()).toMutableList()
 
-        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
+//        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
         return OrderResponseDTO(savedOrder)
     }
 

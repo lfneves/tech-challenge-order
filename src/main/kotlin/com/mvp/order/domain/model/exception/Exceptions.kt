@@ -19,4 +19,7 @@ object Exceptions {
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     class DuplicateException(message: String) : RuntimeException(message)
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Access is denied")
+    class CustomAccessDeniedException(message: String) : RuntimeException(message)
 }

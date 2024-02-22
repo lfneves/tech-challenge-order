@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Private
 
 
 @RestController
@@ -54,14 +53,14 @@ class AuthController @Autowired constructor(
     @PostMapping(value = ["/login"])
     fun login(@RequestBody request: @Valid LoginRequest): ResponseEntity<LoginResponse> {
         try {
-            authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
+            authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.username, request.password))
         } catch (e: Exceptions.BadCredentialsException) {
-            loginService.addLoginAttempt(request.email, false)
+            loginService.addLoginAttempt(request.username, false)
             throw e
         }
 
-        val token: String = JWTUtils.generateToken(request.email)
-        loginService.addLoginAttempt(request.email, true)
-        return ResponseEntity.ok(LoginResponse(request.email, token))
+        val token: String = JWTUtils.generateToken(request.username)
+        loginService.addLoginAttempt(request.username, true)
+        return ResponseEntity.ok(LoginResponse(token))
     }
 }
