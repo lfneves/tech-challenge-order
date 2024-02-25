@@ -28,6 +28,7 @@ class UserDetailsServiceImpl @Autowired constructor(
         return AuthClientDTO(
             userEntity.name ?: throw IllegalStateException("Name is required"),
             userEntity.email ?: throw IllegalStateException("Email is required"),
+            userEntity.cpf ?: throw IllegalStateException("Email is required"),
             userEntity.password ?: throw IllegalStateException("Password is required")
         )
     }

@@ -46,7 +46,4 @@ class AuthServiceImpl @Autowired constructor(
         val address = addressRepository.findById(userEntity.idAddress!!)
         return userEntity.toDTO(address.get())
     }
-
-
-
 }

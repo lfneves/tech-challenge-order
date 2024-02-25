@@ -2,22 +2,20 @@ package com.mvp.order.application.integration.order.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.mvp.order.domain.configuration.AwsSnsConfig
+import com.mvp.order.domain.configuration.AwsConfig
 import com.mvp.order.domain.model.order.OrderByIdResponseDTO
 import com.mvp.order.domain.model.order.OrderProductDTO
 import com.mvp.order.domain.model.order.OrderRequestDTO
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
-import com.mvp.order.domain.service.message.SnsService
+import com.mvp.order.domain.service.message.SnsAndSqsService
 import com.mvp.order.domain.service.order.OrderService
 import io.mockk.*
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
-import io.restassured.RestAssured.port
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -27,10 +25,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.sns.SnsClient
 import software.amazon.awssdk.services.sns.model.PublishRequest
 import software.amazon.awssdk.services.sns.model.PublishResponse
+import software.amazon.awssdk.services.sqs.SqsClient
 import java.math.BigDecimal
 import java.util.*
 
@@ -43,11 +41,12 @@ class OrderControllerTest {
 
     private val TOPIC_ORDER_SNS = System.getenv("TOPIC_ORDER_SNS") ?: "arn:aws:sns:us-east-1:111111111111:ORDER_TOPIC"
 
-    private val awsSnsConfig = mockk<AwsSnsConfig>(relaxed = true)
+    private val awsConfig = mockk<AwsConfig>(relaxed = true)
+    private val sqsClient = mockk<SqsClient>(relaxed = true)
     private val snsClient= mockk<SnsClient>(relaxed = true)
     private val orderService = mockk<OrderService>()
 
-    private val snsService = SnsService(snsClient, awsSnsConfig)
+    private val snsAndSqsService = SnsAndSqsService(snsClient, sqsClient, awsConfig)
 
         @LocalServerPort
     private var port: Int = 8080
@@ -100,7 +99,7 @@ class OrderControllerTest {
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
 
-        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+        every { awsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         val publishRequest = PublishRequest.builder()
             .topicArn(TOPIC_ORDER_SNS)
@@ -141,7 +140,7 @@ class OrderControllerTest {
         )
         val jsonPayload = ObjectMapper().writeValueAsString(productRemoveOrderDTO)
 
-        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+        every { awsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         given()
             .contentType(ContentType.JSON)
@@ -163,7 +162,7 @@ class OrderControllerTest {
             val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
             val jsonPayload = ObjectMapper().writeValueAsString(orderRequestDTO)
 
-            every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+            every { awsConfig.topicArn } returns TOPIC_ORDER_SNS
 
             val publishRequest = PublishRequest.builder()
                 .topicArn(TOPIC_ORDER_SNS)

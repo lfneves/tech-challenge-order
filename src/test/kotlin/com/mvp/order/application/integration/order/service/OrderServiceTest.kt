@@ -1,12 +1,12 @@
 package com.mvp.order.application.integration.order.service
 
-import com.mvp.order.domain.configuration.AwsSnsConfig
+import com.mvp.order.domain.configuration.AwsConfig
 import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.order.OrderDTO
 import com.mvp.order.domain.model.order.OrderProductDTO
 import com.mvp.order.domain.model.order.OrderRequestDTO
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
-import com.mvp.order.domain.service.message.SnsService
+import com.mvp.order.domain.service.message.SnsAndSqsService
 import com.mvp.order.domain.service.order.OrderServiceImpl
 import com.mvp.order.domain.service.product.ProductServiceImpl
 import com.mvp.order.domain.service.user.UserServiceImpl
@@ -26,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
-import software.amazon.awssdk.core.exception.SdkClientException
 import java.math.BigDecimal
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -42,16 +41,16 @@ class OrderServiceTest{
     @Autowired private lateinit var orderService: OrderServiceImpl
     @Autowired private lateinit var orderProductRepository: OrderProductRepository
     @Autowired private lateinit var orderProductResponseRepository: OrderProductResponseRepository
-    @Autowired private lateinit var snsService: SnsService
+    @Autowired private lateinit var snsAndSqsService: SnsAndSqsService
     @Autowired private lateinit var orderRepository: OrderRepository
     @Autowired private lateinit var productService: ProductServiceImpl
     @Autowired private lateinit var userService: UserServiceImpl
 
-    private val awsSnsConfig = mockk<AwsSnsConfig>(relaxed = true)
+    private val awsConfig = mockk<AwsConfig>(relaxed = true)
 
     @BeforeEach
     fun init() {
-        orderService = OrderServiceImpl(snsService, orderRepository, orderProductRepository, orderProductResponseRepository, productService, userService)
+        orderService = OrderServiceImpl(snsAndSqsService, orderRepository, orderProductRepository, orderProductResponseRepository, productService, userService)
     }
 
     @Test
@@ -104,7 +103,7 @@ class OrderServiceTest{
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
 
-        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+        every { awsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         assertThrows<Exception> {
             orderService.createOrder(orderRequestDTO)
@@ -135,7 +134,7 @@ class OrderServiceTest{
         )
         val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
 
-        every { awsSnsConfig.topicArn } returns TOPIC_ORDER_SNS
+        every { awsConfig.topicArn } returns TOPIC_ORDER_SNS
 
         assertThrows<Exception> {
             orderService.updateOrderProduct(orderRequestDTO)

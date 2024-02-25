@@ -9,7 +9,7 @@ import com.mvp.order.domain.model.order.enums.OrderStatusEnum
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.infrastruture.repository.order.OrderProductRepository
 import com.mvp.order.infrastruture.repository.order.OrderRepository
-import com.mvp.order.domain.service.message.SnsService
+import com.mvp.order.domain.service.message.SnsAndSqsService
 import com.mvp.order.domain.service.product.ProductServiceImpl
 import com.mvp.order.domain.service.user.UserServiceImpl
 import com.mvp.order.infrastruture.entity.order.OrderEntity
@@ -25,7 +25,7 @@ import java.util.*
 
 @Service
 class OrderServiceImpl @Autowired constructor(
-    private val snsService: SnsService,
+    private val snsAndSqsService: SnsAndSqsService,
     private val orderRepository: OrderRepository,
     private val orderProductRepository: OrderProductRepository,
     private val orderProductResponseRepository: OrderProductResponseRepository,
@@ -106,7 +106,7 @@ class OrderServiceImpl @Autowired constructor(
         orderRequestDTO.orderProduct.forEach { it.idOrder = savedOrder.id }
         savedOrder.productList = orderProductRepository.saveAll(orderRequestDTO.toEntityList()).toMutableList()
 
-//        snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
+//        snsAndSqsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
         return OrderResponseDTO(savedOrder)
     }
 

@@ -26,4 +26,5 @@ class UserServiceImpl(
             throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_USER_NOT_FOUND)
         }
     }
+
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails
 data class AuthClientDTO(
     val name: String,
     val email: String,
+    val username: String,
     val password: String
 ): UserDetails {
 
