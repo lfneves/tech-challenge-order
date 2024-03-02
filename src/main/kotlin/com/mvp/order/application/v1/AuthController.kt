@@ -1,5 +1,6 @@
 package com.mvp.order.application.v1
 
+import com.mvp.order.domain.configuration.jwt.JWTUtils
 import com.mvp.order.domain.model.auth.ApiErrorResponse
 import com.mvp.order.domain.model.auth.LoginRequest
 import com.mvp.order.domain.model.auth.LoginResponse
@@ -8,7 +9,6 @@ import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.user.UserDTO
 import com.mvp.order.domain.service.auth.AuthService
 import com.mvp.order.domain.service.auth.LoginService
-import com.mvp.order.utils.jwt.JWTUtils
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema

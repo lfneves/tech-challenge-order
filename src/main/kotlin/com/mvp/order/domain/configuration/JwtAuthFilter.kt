@@ -1,9 +1,9 @@
 package com.mvp.order.domain.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.mvp.order.domain.configuration.jwt.JWTUtils
 import com.mvp.order.domain.model.auth.ApiErrorResponse
 import com.mvp.order.domain.service.user.UserDetailsServiceImpl
-import com.mvp.order.utils.jwt.JWTUtils
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
