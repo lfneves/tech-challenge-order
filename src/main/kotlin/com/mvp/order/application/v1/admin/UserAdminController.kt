@@ -25,6 +25,18 @@ class UserAdminController(private val userAdminService: UserAdminService) {
         return ResponseEntity.ok(userAdminService.getUsers())
     }
 
+    @DeleteMapping("/delete-by-id/{id}")
+    @Operation(
+        summary = "Deleta usuários por id",
+        description = "Deleta usuários by id não valida usuárioa admin neste momento",
+        tags = ["Administrador de Usuários"]
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteById(@PathVariable id: Long, authentication: Authentication): ResponseEntity<Unit> {
+        logger.info("Admin - delete-by-id")
+        return ResponseEntity.ok(userAdminService.deleteById(id))
+    }
+
     @DeleteMapping("/delete-all")
     @Operation(
         summary = "Deleta todos usuários",

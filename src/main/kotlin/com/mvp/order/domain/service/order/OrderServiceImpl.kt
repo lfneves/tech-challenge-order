@@ -20,6 +20,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.util.*
 
@@ -77,6 +78,7 @@ class OrderServiceImpl @Autowired constructor(
         }
     }
 
+    @Transactional
     override fun createOrder(orderRequestDTO: OrderRequestDTO): OrderResponseDTO {
         var total: BigDecimal
         val listIDproduct = orderRequestDTO.orderProduct.mapNotNull { it.idProduct }.toMutableList()
@@ -106,7 +108,7 @@ class OrderServiceImpl @Autowired constructor(
         orderRequestDTO.orderProduct.forEach { it.idOrder = savedOrder.id }
         savedOrder.productList = orderProductRepository.saveAll(orderRequestDTO.toEntityList()).toMutableList()
 
-//        snsAndSqsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
+        snsAndSqsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(savedOrder)))
         return OrderResponseDTO(savedOrder)
     }
 

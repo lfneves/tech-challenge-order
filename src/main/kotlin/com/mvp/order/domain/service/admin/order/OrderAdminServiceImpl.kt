@@ -30,7 +30,7 @@ class OrderAdminServiceImpl(
             var order = orderEntity.get()
             order.status = PaymentStatusEnum.valueOf(orderStatusDTO.status).value
             val savedOrder = orderRepository.save(order)
-//            snsAndSqsService.sendMessage(jacksonObjectMapper().writeValueAsString(OrderResponseDTO(savedOrder.toDTO())))
+            snsAndSqsService.sendMessage(jacksonObjectMapper().writeValueAsString(OrderResponseDTO(savedOrder.toDTO())))
             savedOrder.toDTO()
         } else {
             throw Exceptions.BadStatusException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)
@@ -45,7 +45,7 @@ class OrderAdminServiceImpl(
             order.status = OrderStatusEnum.FINISHED.value
             order.isFinished = true
             val savedOrder = orderRepository.save(order)
-//            snsAndSqsService.sendMessage(jacksonObjectMapper().writeValueAsString(OrderResponseDTO(savedOrder.toDTO())))
+            snsAndSqsService.sendMessage(jacksonObjectMapper().writeValueAsString(OrderResponseDTO(savedOrder.toDTO())))
             savedOrder.toDTO()
         } else {
             throw Exceptions.BadStatusException(ErrorMsgConstants.ERROR_ORDER_NOT_FOUND)

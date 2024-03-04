@@ -29,7 +29,7 @@ class OrderAdminController(private val orderAdminService: OrderAdminService) {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(
         summary = "Atualiza o status do pedido",
-        description = "Altera o status do pedido exemplo: PENDING, PREPARING, PAID, FINISHED ",
+        description = "Altera o status do pedido exemplo: PENDING, PREPARING, PAID, FINISHED",
         tags = ["Admin Pedidos"]
     )
     fun updateOrderStatus(@PathVariable id: Long, @RequestBody orderStatusDTO: OrderStatusDTO, authentication: Authentication): ResponseEntity<OrderDTO> {

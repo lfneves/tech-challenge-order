@@ -20,6 +20,14 @@ class UserAdminServiceImpl(
         }
     }
 
+    override fun deleteById(id: Long) {
+        val userEntity = userRepository.findById(id)
+        if(userEntity.isPresent) {
+            val user = userEntity.get()
+            user.idAddress?.let { addressRepository.deleteById(it) }
+            userRepository.deleteById(id)
+        }
+    }
 
     // Used in the development process should not be used in production
     override fun deleteAllUsers() {
