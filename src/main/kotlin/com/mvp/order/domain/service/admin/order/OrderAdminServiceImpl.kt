@@ -15,6 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderAdminServiceImpl(
@@ -23,6 +24,7 @@ class OrderAdminServiceImpl(
 ): OrderAdminService {
     var logger: Logger = LoggerFactory.getLogger(OrderAdminServiceImpl::class.java)
 
+    @Transactional
     override fun updateOrderStatus(id: Long, orderStatusDTO: OrderStatusDTO, authentication: Authentication): OrderDTO {
         logger.info("OrderAdminServiceImpl - updateOrderStatus...")
         val orderEntity = orderRepository.findByIdOrder(id)
@@ -37,6 +39,7 @@ class OrderAdminServiceImpl(
         }
     }
 
+    @Transactional
     override fun updateOrderFinishedAndStatus(orderFinishDTO: OrderFinishDTO, authentication: Authentication): OrderDTO {
         logger.info("OrderAdminServiceImpl - updateOrderFinishedAndStatus...")
         val orderEntity = orderRepository.findByIdOrder(orderFinishDTO.idOrder)

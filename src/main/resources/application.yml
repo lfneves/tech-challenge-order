@@ -37,5 +37,5 @@ order:
     statusQueue: "${STATUS_QUEUE:https://sqs.us-east-1.amazonaws.com/1111111/STATUS_QUEUE}"
 
 jwt:
-  # dev default secret wont use production
+  # Used in the development process should not be used in production
   secret: "${SECRET_KEY:eW91ci12ZXJ5LWxvbmctc2VjcmV0LXN0cmluZy1oZXJlLWRlZmF1bHQtZGV2LXZhbHVl}"

@@ -1,6 +1,5 @@
 package com.mvp.order.application.unit.jwt
 
-import com.mvp.order.domain.configuration.JwtConfig
 import com.mvp.order.domain.configuration.jwt.JWTUtils
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -13,8 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import javax.crypto.SecretKey
 
 class JWTUtilsTest {
-    
-    private val jwtConfig = JwtConfig()
+
     @Test
     fun `generate token and validate`() {
         val email = "test@example.com"

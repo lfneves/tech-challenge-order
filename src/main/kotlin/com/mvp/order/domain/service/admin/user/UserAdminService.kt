@@ -6,7 +6,7 @@ interface UserAdminService {
 
     fun getUsers(): List<UserDTO>
 
-    fun deleteById(id: Long)
+    fun deleteByUsername(username: String)
 
     fun deleteAllUsers()
 }
