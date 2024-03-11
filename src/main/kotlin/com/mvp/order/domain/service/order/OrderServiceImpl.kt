@@ -143,8 +143,14 @@ class OrderServiceImpl @Autowired constructor(
 
     override fun deleteOrderById(id: Long) {
         try {
-            orderProductRepository.deleteByIdOrder(id)
-            orderRepository.deleteById(id)
+            val orderEntityOptional = orderRepository.findByIdOrder(id)
+            if(orderEntityOptional.isPresent) {
+                val orderEntity = orderEntityOptional.get()
+                orderProductRepository.deleteByIdOrder(id)
+                orderRepository.deleteById(id)
+                orderEntity.status = OrderStatusEnum.CANCELED.value
+                snsAndSqsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(orderEntity.toDTO())))
+            }
         } catch (e: Throwable) {
             logger.error(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND, e.printStackTrace())
             throw Exceptions.NotFoundException(ErrorMsgConstants.ERROR_ORDER_PRODUCT_NOT_FOUND)

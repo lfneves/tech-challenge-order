@@ -11,5 +11,6 @@ class ErrorMsgConstants {
         const val ERROR_CATEGORY_NOT_FOUND      = "Categoria do produto não encontrada."
         const val ERROR_ORDER_PAID_CONSTANT     = "Pedido já foi pago, caso queira adicionar novos produtos, cancele e inicie um novo pedido"
         const val ERROR_USER_ALREADY_EXIST      = "Usuário já está cadastrado."
+        const val ERROR_LOGIN_BAD_REQUEST       = "Ocorreu um erro no login."
     }
 }

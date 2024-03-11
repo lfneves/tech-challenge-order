@@ -9,6 +9,7 @@ import com.mvp.order.domain.model.exception.Exceptions
 import com.mvp.order.domain.model.user.UserDTO
 import com.mvp.order.domain.service.auth.AuthService
 import com.mvp.order.domain.service.auth.LoginService
+import com.mvp.order.utils.constants.ErrorMsgConstants
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
 
@@ -51,16 +53,19 @@ class AuthController @Autowired constructor(
     @ApiResponse(responseCode = "404", content = [Content(schema = Schema(implementation = ApiErrorResponse::class))])
     @ApiResponse(responseCode = "500", content = [Content(schema = Schema(implementation = ApiErrorResponse::class))])
     @PostMapping(value = ["/login"])
-    fun login(@RequestBody request: @Valid LoginRequest): ResponseEntity<LoginResponse> {
+    fun login(@RequestBody request: @Valid LoginRequest): ResponseEntity<out Record> {
         try {
             authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.username, request.password))
-        } catch (e: Exceptions.BadCredentialsException) {
+            val token: String = JWTUtils.generateToken(request.username)
+            loginService.addLoginAttempt(request.username, true)
+            return ResponseEntity.ok(LoginResponse(token))
+        } catch (e: BadCredentialsException) {
             loginService.addLoginAttempt(request.username, false)
             throw e
+        }  catch (e: Exception) {
+            loginService.addLoginAttempt(request.username, false)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid username or password"))
         }
-
-        val token: String = JWTUtils.generateToken(request.username)
-        loginService.addLoginAttempt(request.username, true)
-        return ResponseEntity.ok(LoginResponse(token))
     }
 }

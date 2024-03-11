@@ -5,6 +5,7 @@ import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
 import com.mvp.order.domain.model.product.ProductRequestDTO
 import io.swagger.v3.oas.annotations.Operation
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -31,7 +32,7 @@ class ProductAdminController(private val productAdminService: ProductAdminServic
         tags = ["Administrador Produtos"]
     )
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun updateProduct(@PathVariable id: Long, @RequestBody productRequestDTO: ProductRequestDTO): ResponseEntity<ProductDTO> {
+    fun updateProduct(@PathVariable id: Long, @RequestBody productRequestDTO: @Valid ProductRequestDTO): ResponseEntity<ProductDTO> {
         return ResponseEntity.ok(productAdminService.updateProduct(id, productRequestDTO))
     }
 

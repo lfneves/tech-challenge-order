@@ -10,6 +10,7 @@ import java.math.BigDecimal
 @Table(name = "tb_product")
 data class ProductEntity(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     @Column(name = "name")
     var name: String = "",

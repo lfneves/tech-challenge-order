@@ -1,12 +1,11 @@
 package com.mvp.order.application.v1.admin
 
 import com.mvp.order.domain.model.auth.RemoveUserDTO
-import com.mvp.order.domain.model.user.UserDTO
+import com.mvp.order.domain.model.user.admin.UserAdminResponseDTO
 import com.mvp.order.domain.service.admin.user.UserAdminService
 import io.swagger.v3.oas.annotations.Operation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -23,7 +22,7 @@ class UserAdminController(private val userAdminService: UserAdminService) {
         description = "Busca todos usuários cadastrados não valida usuárioa admin neste momento",
         tags = ["Administrador de Usuários"]
     )
-    fun all(): ResponseEntity<List<UserDTO>> {
+    fun all(): ResponseEntity<List<UserAdminResponseDTO>> {
         return ResponseEntity.ok(userAdminService.getUsers())
     }
 
@@ -36,7 +35,7 @@ class UserAdminController(private val userAdminService: UserAdminService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteById(@RequestBody request: RemoveUserDTO): ResponseEntity<Unit> {
         logger.info("Admin - delete-by-username")
-        return ResponseEntity.ok(userAdminService.deleteByUsername(request.username))
+        return ResponseEntity.ok(userAdminService.deleteByUsername(request))
     }
 
     @DeleteMapping("/delete-all")
