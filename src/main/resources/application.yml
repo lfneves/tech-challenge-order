@@ -13,23 +13,29 @@ spring:
   profiles:
     active: production
   datasource:
-#    url: "${POSTGRES_HOST:jdbc:postgresql://localhost:5432/postgresdb}"
-    host: "${POSTGRES_HOST:localhost}"
-    port: "${POSTGRES_PORT:5432}"
-    database: "${POSTGRES_DB:postgresdb}"
-    user: "${POSTGRES_USER:postgres}"
-    password: "${POSTGRES_PASSWORD:postgres}"
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:postgresdb}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      transaction:
+        jta:
+          platform: none
+      ddl-auto: update
+    show-sql: true
+  jta:
+    enabled: false
   docker:
     compose:
       file: "docker-compose.yml"
 
 order:
   sns:
-    topicArn: "${TOPIC_ORDER_SNS}"
+    region: us-east-1
+    topicArn: "${TOPIC_ORDER_SNS:arn:aws:sns:us-east-1:1111111:ORDER_TOPIC}"
+    statusQueue: "${STATUS_QUEUE:https://sqs.us-east-1.amazonaws.com/1111111/STATUS_QUEUE}"
+
+jwt:
+  # Used in the development process should not be used in production
+  secret: "${SECRET_KEY:eW91ci12ZXJ5LWxvbmctc2VjcmV0LXN0cmluZy1oZXJlLWRlZmF1bHQtZGV2LXZhbHVl}"

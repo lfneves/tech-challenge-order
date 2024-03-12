@@ -6,7 +6,7 @@ import com.mvp.order.domain.model.product.CategoryDTO
 import com.mvp.order.domain.model.product.ProductDTO
 import com.mvp.order.domain.model.product.ProductRemoveOrderDTO
 import com.mvp.order.domain.model.user.UserDTO
-import com.mvp.order.domain.service.message.SnsService
+import com.mvp.order.domain.service.message.SnsAndSqsService
 import com.mvp.order.domain.service.order.OrderService
 import com.mvp.order.domain.service.order.OrderServiceImpl
 import com.mvp.order.domain.service.product.ProductServiceImpl
@@ -36,7 +36,7 @@ class OrderUnitTest {
     private val mapper = mockk<ObjectMapper>()
 
     private lateinit var orderService: OrderService
-    private lateinit var snsService: SnsService
+    private lateinit var snsAndSqsService: SnsAndSqsService
 
     private lateinit var orderProducts: MutableList<OrderProductResponseDTO>
     private lateinit var orderProductsEntity: MutableList<OrderProductResponseEntity>
@@ -55,8 +55,8 @@ class OrderUnitTest {
 
     @BeforeEach
     fun setup() {
-        snsService = mockk(relaxed = true)
-        orderService = OrderServiceImpl(snsService, orderRepository, orderProductRepository, orderProductResponseRepository, productService, userService)
+        snsAndSqsService = mockk(relaxed = true)
+        orderService = OrderServiceImpl(snsAndSqsService, orderRepository, orderProductRepository, orderProductResponseRepository, productService, userService)
 
         orderProductResponseEntity = OrderProductResponseEntity(
             id = 1,
@@ -146,7 +146,7 @@ class OrderUnitTest {
 
         // Mock orderProductRepository response
         every { orderProductRepository.saveAll(listOrderProductEntity) } answers { firstArg() }
-        every { snsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(orderEntity.toDTO()))) } just Runs
+        every { snsAndSqsService.sendMessage(mapper.writeValueAsString(OrderResponseDTO(orderEntity.toDTO()))) } just Runs
 
         // Perform the test
         val result = orderService.createOrder(orderRequestDTO)
