@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
@@ -31,7 +32,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-@Profile("test")
+@ActiveProfiles("test")
 @SpringBootTest
 class OrderServiceTest{
     private val logger = LoggerFactory.getLogger(OrderServiceTest::class.java)
@@ -175,7 +176,7 @@ class OrderServiceTest{
     }
 
     @Test
-    @Sql(scripts = ["/sql/order.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = ["/sql/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `deleteOrderById successfully deletes an order`() {
         val orderId = 1L
 

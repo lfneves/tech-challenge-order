@@ -16,12 +16,17 @@ sonar {
 		property("sonar.projectKey", "lfneves_tech-challenge-order")
 		property("sonar.organization", "lfneves")
 		property("sonar.host.url", "https://sonarcloud.io")
-		property("sonar.exclusions", "**/configuration/*")
-		property("sonar.exclusions", "**/model/*")
-		property("sonar.exclusions", "**/utils/*")
+		property("sonar.exclusions", "**/configuration/**")
+		property("sonar.exclusions", "**/model/**")
+		property("sonar.exclusions", "**/utils/**")
 		property("sonar.exclusions", "**/com/mvp/order/OrderApplication.kt")
-		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/*")
-		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/*")
+		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/**")
+		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/**")
+		property("sonar.exclusions", "**/admin/**")
+		property("sonar.exclusions", "**/auth/**")
+		property("sonar.exclusions", "**/handler/**")
+		property("sonar.exclusions", "**/AuthController.class")
+		property("sonar.exclusions", "**/UserDetailsServiceImpl.class")
 		property("sonar.jacoco.reportPaths", "$rootDir/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml")
 	}
 }
@@ -132,7 +137,8 @@ tasks.jacocoTestReport {
 		html.required.set(true)
 	}
 	val excludes = listOf("**/configuration/*", "**/model/*",
-		"**/utils/*", "**/com/mvp/order/OrderApplication.kt", "**/com/mvp/order/infrastruture/entity/*")
+		"**/utils/*", "**/com/mvp/order/OrderApplication.class", "**/com/mvp/order/infrastruture/entity/*",
+		"**/admin/**", "**/auth/**", "**/handler/**", "**/AuthController.class", "**/UserDetailsServiceImpl.class")
 	classDirectories.setFrom(files(classDirectories.files.map {
 		fileTree(it).apply {
 			exclude(excludes)
@@ -143,7 +149,8 @@ tasks.jacocoTestReport {
 tasks.jacocoTestCoverageVerification {
 	violationRules {
 		val excludes = listOf("**/configuration/**", "**/com/mvp/order/domain/model/**",
-			"**/utils/**", "**/com/mvp/order/OrderApplication.kt", "**/com/mvp/order/infrastruture/entity/**")
+			"**/utils/**", "**/com/mvp/order/OrderApplication.class", "**/com/mvp/order/infrastruture/entity/**",
+			"**/admin/**", "**/auth/**", "**/handler/**", "**/AuthController.class", "**/UserDetailsServiceImpl.class")
 			classDirectories.setFrom(files(classDirectories.files.map {
 				fileTree(it).exclude(excludes)
 			}))

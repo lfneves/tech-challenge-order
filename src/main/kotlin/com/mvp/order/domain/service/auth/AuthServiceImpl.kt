@@ -8,11 +8,13 @@ import com.mvp.order.infrastruture.repository.user.AddressRepository
 import com.mvp.order.infrastruture.repository.user.UserRepository
 import com.mvp.order.utils.constants.ErrorMsgConstants
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
+@Profile("!test")
 class AuthServiceImpl @Autowired constructor(
     private val userRepository: UserRepository,
     private val addressRepository: AddressRepository
