@@ -23,6 +23,8 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import software.amazon.awssdk.services.sns.SnsClient
@@ -33,9 +35,12 @@ import java.math.BigDecimal
 import java.util.*
 
 
-@Profile("test")
+@ActiveProfiles("test")
 @ExtendWith(SpringExtension::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = [
+    "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration",
+    "spring.security.enabled=false"
+])
 @AutoConfigureMockMvc
 class OrderControllerTest {
 
@@ -82,6 +87,7 @@ class OrderControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin", roles=["USER", "ADMIN"])
     fun `Get All Order Products By Order ID`() {
         given()
             .get("/api/v1/order/all-products-by-order-id/{id}", 1)
@@ -120,8 +126,29 @@ class OrderControllerTest {
     }
 
     @Test
+    @Sql(scripts = ["/sql/order_delete_before_insert.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     fun `test delete order by id`() {
         val orderId = 1L
+
+        val orderProductDTO = OrderProductDTO(
+            id = 1,
+            idProduct = 1,
+            idOrder = 1
+        )
+        val orderRequestDTO = OrderRequestDTO(listOf(orderProductDTO), "99999999999")
+
+        every { awsConfig.topicArn } returns TOPIC_ORDER_SNS
+
+        val publishRequest = PublishRequest.builder()
+            .topicArn(TOPIC_ORDER_SNS)
+            .message(jacksonObjectMapper().writeValueAsString(orderRequestDTO))
+            .build()
+
+        val fakeResponse = PublishResponse.builder()
+            .messageId("fakeMessageId")
+            .build()
+
+        every { snsClient.publish(publishRequest) } returns fakeResponse
 
         given()
             .contentType(ContentType.JSON)

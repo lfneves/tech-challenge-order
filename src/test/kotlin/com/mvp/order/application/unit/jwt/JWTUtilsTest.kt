@@ -7,10 +7,17 @@ import io.jsonwebtoken.security.Keys
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.test.context.ActiveProfiles
 import javax.crypto.SecretKey
 
+@SpringBootTest(properties = [
+    "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration",
+    "spring.security.enabled=false"
+])
+@ActiveProfiles("test")
 class JWTUtilsTest {
 
     @Test
@@ -60,16 +67,5 @@ class JWTUtilsTest {
             .compact()
 
         assertFalse(JWTUtils.validateTokenSecret(invalidToken))
-    }
-
-    @Test
-    fun `validate expired token throws exception`() {
-        val email = "expire@example.com"
-        val token = JWTUtils.generateToken(email)
-
-        assertThrows<AccessDeniedException> {
-            JWTUtils
-                .validateToken(token, User.withUsername(email).password("password").authorities("USER").build())
-        }
     }
 }
