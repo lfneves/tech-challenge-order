@@ -41,6 +41,7 @@ class SecurityConfig @Autowired constructor(
                 auth
                     .requestMatchers(HttpMethod.POST, "/api/auth/signup/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/auth/login/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                     .requestMatchers(HttpMethod.GET, "/authentication-docs/**")
                     .permitAll()
                     .anyRequest().authenticated()

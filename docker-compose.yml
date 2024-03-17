@@ -1,10 +1,12 @@
-version: '3.7'
+version: '3.8'
 
 services:
   order-ws:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: order-ws:latest
     container_name: order-ws
-    build: .
     ports:
       - '8099:8099'
     depends_on:
