@@ -45,13 +45,17 @@ configurations.all {
 	exclude(group = "commons-logging", module = "commons-logging")
 }
 
+val actuatorRuntime by configurations.creating
+
 dependencies {
 
 	// Spring
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	actuatorRuntime("org.springframework.boot:spring-boot-starter-actuator")
+
+	// Kotlin
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
@@ -96,6 +100,15 @@ dependencies {
 	implementation("io.cucumber:cucumber-junit:7.15.0")
 
 	testImplementation("org.jacoco:org.jacoco.core:0.8.11")
+}
+
+configurations {
+	runtimeClasspath {
+		extendsFrom(actuatorRuntime)
+	}
+	testImplementation {
+		exclude(module = "spring-boot-starter-actuator")
+	}
 }
 
 tasks.withType<KotlinCompile> {
