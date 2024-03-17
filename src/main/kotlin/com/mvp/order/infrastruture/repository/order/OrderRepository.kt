@@ -17,7 +17,8 @@ interface OrderRepository : JpaRepository<OrderEntity, Long> {
          INNER JOIN tb_client ON tb_client.id = tb_order.id_client
          INNER JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
          INNER JOIN tb_product ON tb_product.id = tb_order_product.id_product
-         WHERE tb_client.cpf = :username
+         WHERE tb_client.cpf = :username 
+            OR tb_client.email = :username
          GROUP BY tb_order.id, id_client, status, is_finished
     """, nativeQuery = true)
     fun findByUsername(username: String?): OrderEntity
@@ -29,6 +30,7 @@ interface OrderRepository : JpaRepository<OrderEntity, Long> {
          LEFT JOIN tb_order_product ON tb_order_product.id_order = tb_order.id
          LEFT JOIN tb_product ON tb_product.id = tb_order_product.id_product
          WHERE tb_client.cpf = :username
+            OR tb_client.email = :username
          GROUP BY tb_order.id, id_client, status, is_finished
     """, nativeQuery = true)
     fun findByUsernameIfExists(username: String?): Optional<OrderEntity>

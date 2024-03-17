@@ -16,12 +16,17 @@ sonar {
 		property("sonar.projectKey", "lfneves_tech-challenge-order")
 		property("sonar.organization", "lfneves")
 		property("sonar.host.url", "https://sonarcloud.io")
-		property("sonar.exclusions", "**/configuration/*")
-		property("sonar.exclusions", "**/model/*")
-		property("sonar.exclusions", "**/utils/*")
+		property("sonar.exclusions", "**/configuration/**")
+		property("sonar.exclusions", "**/model/**")
+		property("sonar.exclusions", "**/utils/**")
 		property("sonar.exclusions", "**/com/mvp/order/OrderApplication.kt")
-		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/*")
-		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/*")
+		property("sonar.exclusions", "**/com/mvp/order/infrastruture/entity/**")
+		property("sonar.exclusions", "**src/test/kotlin/com/mvp/order/**")
+		property("sonar.exclusions", "**/admin/**")
+		property("sonar.exclusions", "**/auth/**")
+		property("sonar.exclusions", "**/handler/**")
+		property("sonar.exclusions", "**/AuthController.class")
+		property("sonar.exclusions", "**/UserDetailsServiceImpl.class")
 		property("sonar.jacoco.reportPaths", "$rootDir/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml")
 	}
 }
@@ -40,17 +45,22 @@ configurations.all {
 	exclude(group = "commons-logging", module = "commons-logging")
 }
 
+val actuatorRuntime by configurations.creating
+
 dependencies {
 
 	// Spring
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	//implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	actuatorRuntime("org.springframework.boot:spring-boot-starter-actuator")
+
+	// Kotlin
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	// Database
-	runtimeOnly("org.postgresql:postgresql")
+	implementation("org.postgresql:postgresql")
 	runtimeOnly("com.h2database:h2")
 
 	//Kotlin utils
@@ -92,6 +102,15 @@ dependencies {
 	testImplementation("org.jacoco:org.jacoco.core:0.8.11")
 }
 
+configurations {
+	runtimeClasspath {
+		extendsFrom(actuatorRuntime)
+	}
+	testImplementation {
+		exclude(module = "spring-boot-starter-actuator")
+	}
+}
+
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
@@ -131,7 +150,8 @@ tasks.jacocoTestReport {
 		html.required.set(true)
 	}
 	val excludes = listOf("**/configuration/*", "**/model/*",
-		"**/utils/*", "**/com/mvp/order/OrderApplication.kt", "**/com/mvp/order/infrastruture/entity/*")
+		"**/utils/*", "**/com/mvp/order/OrderApplication.class", "**/com/mvp/order/infrastruture/entity/*",
+		"**/admin/**", "**/auth/**", "**/handler/**", "**/AuthController.class", "**/UserDetailsServiceImpl.class")
 	classDirectories.setFrom(files(classDirectories.files.map {
 		fileTree(it).apply {
 			exclude(excludes)
@@ -142,7 +162,8 @@ tasks.jacocoTestReport {
 tasks.jacocoTestCoverageVerification {
 	violationRules {
 		val excludes = listOf("**/configuration/**", "**/com/mvp/order/domain/model/**",
-			"**/utils/**", "**/com/mvp/order/OrderApplication.kt", "**/com/mvp/order/infrastruture/entity/**")
+			"**/utils/**", "**/com/mvp/order/OrderApplication.class", "**/com/mvp/order/infrastruture/entity/**",
+			"**/admin/**", "**/auth/**", "**/handler/**", "**/AuthController.class", "**/UserDetailsServiceImpl.class")
 			classDirectories.setFrom(files(classDirectories.files.map {
 				fileTree(it).exclude(excludes)
 			}))

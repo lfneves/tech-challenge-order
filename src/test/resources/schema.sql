@@ -51,3 +51,10 @@ CREATE TABLE IF NOT EXISTS tb_order_product (
     id_product          INTEGER REFERENCES tb_product(id),
     id_order            INTEGER REFERENCES tb_order(id)
 );
+
+CREATE TABLE IF NOT EXISTS tb_login_attempt (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NULL,
+    success BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

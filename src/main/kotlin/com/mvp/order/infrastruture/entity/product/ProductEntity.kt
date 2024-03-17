@@ -10,6 +10,7 @@ import java.math.BigDecimal
 @Table(name = "tb_product")
 data class ProductEntity(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     @Column(name = "name")
     var name: String = "",
@@ -21,6 +22,15 @@ data class ProductEntity(
     @Column(name = "id_category")
     var idCategory: Long? = null
 ) {
+
+    fun updateUserEntity(productEntity: ProductEntity, request: ProductEntity) {
+        request.id?.let { productEntity.id = it }
+        request.name.let { productEntity.name = it }
+        request.price.let { productEntity.price = it }
+        request.quantity.let { productEntity.quantity = it }
+        request.idCategory?.let { productEntity.idCategory = it }
+    }
+
     fun toDTO(): ProductDTO {
         return ProductDTO(
             id = this.id,

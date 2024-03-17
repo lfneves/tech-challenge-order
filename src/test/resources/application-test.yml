@@ -6,6 +6,10 @@ server:
     include-message: always
 
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  profiles:
+    profile: test
   datasource:
     url: jdbc:h2:mem:postgresdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;TRACE_LEVEL_FILE=4
     driver-class-name: org.h2.Driver
@@ -31,4 +35,10 @@ logging:
 
 order:
   sns:
-    topicArn: "${TOPIC_ORDER_SNS}"
+    region: us-east-1
+    topicArn: "${TOPIC_ORDER_SNS:arn:aws:sns:us-east-1:1111111:ORDER_TOPIC}"
+    statusQueue: "${STATUS_QUEUE:https://sqs.us-east-1.amazonaws.com/1111111/STATUS_QUEUE}"
+
+jwt:
+  # Used in the development process should not be used in production
+  secret: "${SECRET_KEY:eW91ci12ZXJ5LWxvbmctc2VjcmV0LXN0cmluZy1oZXJlLWRlZmF1bHQtZGV2LXZhbHVl}"
